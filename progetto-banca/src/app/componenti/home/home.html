@@ -1,1 +1,21 @@
-<p>home works!</p>
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="hamburger" (click)="toggleMenu()" [class.active]="menuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <ul class="nav-menu" [class.active]="menuOpen">
+      <li><a routerLink="/deposito" (click)="closeMenu()">Deposito</a></li>
+      <li><a routerLink="/prelievo" (click)="closeMenu()">Prelievo</a></li>
+      <li><a routerLink="/saldo" (click)="closeMenu()">Saldo</a></li>
+      <li><a routerLink="/lista-movimenti" (click)="closeMenu()">Lista Movimenti</a></li>
+      <li><a routerLink="/conv-fiat" (click)="closeMenu()">Conversione Fiat</a></li>
+      <li><a routerLink="/conv-cripto" (click)="closeMenu()">Conversione Cripto</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Qui verranno caricati i componenti -->
+<router-outlet></router-outlet>
+

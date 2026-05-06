@@ -1,0 +1,149 @@
+/* ==================== REVOLUT-STYLE DESIGN ==================== */
+.cripto-container {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.cripto-container h2 {
+  color: #191c1f;
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.cripto-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #191c1f;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.form-group select,
+.form-group input {
+  padding: 16px 20px;
+  border: 2px solid #e6e8ea;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #191c1f;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #0075eb;
+  box-shadow: 0 0 0 3px rgba(0, 117, 235, 0.1);
+  background: #ffffff;
+}
+
+.form-group input::placeholder {
+  color: #8a8e91;
+}
+
+.risultato {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e6e8ea;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.prezzo,
+.totale-fiat,
+.equivalente-cripto {
+  margin: 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.prezzo {
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+
+.totale-fiat {
+  font-weight: 700;
+  font-size: 20px;
+  color: #191c1f;
+  margin: 16px 0;
+}
+
+.equivalente-cripto {
+  font-weight: 600;
+  font-size: 14px;
+  color: #00d4aa;
+  background: rgba(0, 212, 170, 0.05);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 212, 170, 0.1);
+  margin-top: 16px;
+}
+
+.btn-converti {
+  background: linear-gradient(135deg, #0075eb 0%, #0057d9 100%);
+  color: #ffffff;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(0, 117, 235, 0.3);
+}
+
+.btn-converti:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 117, 235, 0.4);
+}
+
+.btn-converti:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 117, 235, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cripto-container {
+    margin: 20px;
+    padding: 24px;
+    border-radius: 20px;
+  }
+
+  .cripto-container h2 {
+    font-size: 24px;
+  }
+
+  .risultato {
+    padding: 20px;
+  }
+}

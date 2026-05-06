@@ -1,0 +1,103 @@
+/* ==================== REVOLUT-STYLE DESIGN ==================== */
+.prelievo-container {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.prelievo-container h2 {
+  color: #191c1f;
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.prelievo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #191c1f;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.form-group input,
+.form-group select {
+  padding: 16px 20px;
+  border: 2px solid #e6e8ea;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  color: #191c1f;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #0075eb;
+  box-shadow: 0 0 0 3px rgba(0, 117, 235, 0.1);
+  background: #ffffff;
+}
+
+.form-group input::placeholder {
+  color: #8a8e91;
+}
+
+.btn-prelievo {
+  background: linear-gradient(135deg, #0075eb 0%, #0057d9 100%);
+  color: #ffffff;
+  border: none;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 16px rgba(0, 117, 235, 0.3);
+}
+
+.btn-prelievo:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(0, 117, 235, 0.4);
+}
+
+.btn-prelievo:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 117, 235, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .prelievo-container {
+    margin: 20px;
+    padding: 24px;
+    border-radius: 20px;
+  }
+
+  .prelievo-container h2 {
+    font-size: 24px;
+  }
+}

@@ -1,1 +1,52 @@
-<p>lista-movimenti works!</p>
+<div class="movimenti-container">
+  <h2>📋 Lista Movimenti</h2>
+  <div class="filtri">
+    <div class="filtro-group">
+      <label for="periodo">Periodo:</label>
+      <select id="periodo">
+        <option value="oggi">Oggi</option>
+        <option value="settimana">Questa settimana</option>
+        <option value="mese">Questo mese</option>
+        <option value="anno">Quest'anno</option>
+      </select>
+    </div>
+    <div class="filtro-group">
+      <label for="tipo">Tipo:</label>
+      <select id="tipo">
+        <option value="tutti">Tutti</option>
+        <option value="entrata">Entrate</option>
+        <option value="uscita">Uscite</option>
+      </select>
+    </div>
+  </div>
+  <div class="movimenti-list">
+    <div class="movimento-item entrata">
+      <div class="movimento-info">
+        <div class="movimento-descrizione">Stipendio</div>
+        <div class="movimento-data">15/05/2024</div>
+      </div>
+      <div class="movimento-importo">+ € 2,500.00</div>
+    </div>
+    <div class="movimento-item uscita">
+      <div class="movimento-info">
+        <div class="movimento-descrizione">Supermercato</div>
+        <div class="movimento-data">14/05/2024</div>
+      </div>
+      <div class="movimento-importo">- € 85.30</div>
+    </div>
+    <div class="movimento-item entrata">
+      <div class="movimento-info">
+        <div class="movimento-descrizione">Rimborso</div>
+        <div class="movimento-data">12/05/2024</div>
+      </div>
+      <div class="movimento-importo">+ € 150.00</div>
+    </div>
+    <div class="movimento-item uscita">
+      <div class="movimento-info">
+        <div class="movimento-descrizione">Bollette</div>
+        <div class="movimento-data">10/05/2024</div>
+      </div>
+      <div class="movimento-importo">- € 120.50</div>
+    </div>
+  </div>
+</div>
