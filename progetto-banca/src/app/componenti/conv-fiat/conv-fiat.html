@@ -1,24 +1,16 @@
 <div class="conversione-container">
   <h2>💱 Conversione Fiat</h2>
+
   <div class="saldo-info">
-    <p>Il tuo saldo attuale convertito in {{aValuta}}: <strong>{{getSimboloValuta(aValuta)}} {{formattaNumero(saldoConvertito)}}</strong></p>
+    <p>
+      Il tuo saldo attuale:
+      <strong>{{ getSimboloValuta('EUR') }} {{ formattaNumero(saldoAttuale) }}</strong>
+    </p>
   </div>
+
   <div class="conversione-form">
     <div class="form-group">
-      <label for="da-valuta">Da:</label>
-      <select id="da-valuta" [(ngModel)]="daValuta" (change)="onValutaChange()">
-        <option value="EUR">EUR - Euro</option>
-        <option value="USD">USD - Dollaro USA</option>
-        <option value="GBP">GBP - Sterlina</option>
-        <option value="JPY">JPY - Yen</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="importo-convertire">Importo:</label>
-      <input type="number" id="importo-convertire" [(ngModel)]="importo" (input)="onImportoChange()" placeholder="100.00" min="0.01" step="0.01">
-    </div>
-    <div class="form-group">
-      <label for="a-valuta">A:</label>
+      <label for="a-valuta">Visualizza saldo convertito in:</label>
       <select id="a-valuta" [(ngModel)]="aValuta" (change)="onValutaChange()">
         <option value="USD">USD - Dollaro USA</option>
         <option value="EUR">EUR - Euro</option>
@@ -26,11 +18,12 @@
         <option value="JPY">JPY - Yen</option>
       </select>
     </div>
+
     <div class="risultato">
-      <div class="tasso">Tasso di cambio: <span>{{formattaNumero(tassoDiCambio, 4)}}</span></div>
-      <div class="totale-fiat">Riceverai: <span>{{getSimboloValuta(aValuta)}} {{formattaNumero(totaleFiat)}}</span></div>
-      <div class="equivalente-cripto">Equivalente in BTC: <span>{{formattaNumero(equivalenteCripto, 6)}} ₿</span></div>
+      <div class="totale-fiat">
+        Saldo convertito:
+        <span>{{ getSimboloValuta(aValuta) }} {{ formattaNumero(saldoConvertito) }}</span>
+      </div>
     </div>
-    <button class="btn btn-primary" (click)="onConverti()">Converti Ora</button>
   </div>
 </div>

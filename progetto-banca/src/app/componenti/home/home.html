@@ -1,47 +1,34 @@
-<nav class="navbar">
-  <div class="navbar-container">
-    <div class="hamburger" (click)="toggleMenu()" [class.active]="menuOpen">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <ul class="nav-menu" [class.active]="menuOpen">
-      <li><a routerLink="/deposito" (click)="closeMenu()">Deposito</a></li>
-      <li><a routerLink="/prelievo" (click)="closeMenu()">Prelievo</a></li>
-      <li><a routerLink="/saldo" (click)="closeMenu()">Saldo</a></li>
-      <li><a routerLink="/lista-movimenti" (click)="closeMenu()">Lista Movimenti</a></li>
-      <li><a routerLink="/conv-fiat" (click)="closeMenu()">Conversione Fiat</a></li>
-      <li><a routerLink="/conv-cripto" (click)="closeMenu()">Conversione Cripto</a></li>
-      <li><a routerLink="/transazioni" (click)="closeMenu()">Transazioni</a></li>
-    </ul>
-  </div>
-</nav>
+<section class="home-hero">
+  <p class="kicker">Banca Digitale</p>
+  <h1>Controlla i tuoi soldi con uno stile moderno.</h1>
+  <p class="subtitle">
+    Deposita, preleva, converti e traccia i movimenti da un'unica dashboard.
+  </p>
+</section>
 
-<div class="home-container">
-  <div class="welcome-section">
-    <h1>Benvenuto nella tua Banca Digitale</h1>
-    <p>Gestisci i tuoi soldi in modo semplice e sicuro</p>
-  </div>
-
-  <div class="quick-cards">
-    <div class="quick-card">
-      <h3>💰 Deposito</h3>
-      <p>Aggiungi fondi al tuo conto</p>
-      <a routerLink="/deposito" class="btn btn-primary">Vai al Deposito</a>
-    </div>
-    <div class="quick-card">
-      <h3>💸 Prelievo</h3>
-      <p>Preleva i tuoi soldi</p>
-      <a routerLink="/prelievo" class="btn btn-danger">Vai al Prelievo</a>
-    </div>
-    <div class="quick-card">
-      <h3>🔄 Conversioni</h3>
-      <p>Converti valute e cripto</p>
-      <a routerLink="/conv-fiat" class="btn btn-primary">Converti</a>
-    </div>
-  </div>
-</div>
-
-<!-- Qui verranno caricati i componenti -->
-<router-outlet></router-outlet>
-
+<section class="home-grid">
+  <a class="feature-card" routerLink="/saldo">
+    <h3>Saldo</h3>
+    <p>Visualizza subito disponibilita e riepilogo conto.</p>
+  </a>
+  <a class="feature-card" routerLink="/deposito">
+    <h3>Deposito</h3>
+    <p>Aggiungi fondi in pochi secondi nella tua pagina dedicata.</p>
+  </a>
+  <a class="feature-card" routerLink="/prelievo">
+    <h3>Prelievo</h3>
+    <p>Esegui prelievi con controllo immediato del saldo.</p>
+  </a>
+  <a class="feature-card" routerLink="/lista-movimenti">
+    <h3>Lista Movimenti</h3>
+    <p>Apri il dettaglio di ogni transazione con un click.</p>
+  </a>
+  <a class="feature-card" routerLink="/conv-fiat">
+    <h3>Conversione Fiat</h3>
+    <p>Controvalore aggiornato in valuta fiat selezionata.</p>
+  </a>
+  <a class="feature-card" routerLink="/conv-cripto">
+    <h3>Conversione Cripto</h3>
+    <p>Controvalore del saldo in crypto in tempo reale.</p>
+  </a>
+</section>

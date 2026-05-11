@@ -5,16 +5,17 @@
 
 /* CSS Variables for Design System */
 :root {
-  /* Colors */
-  --primary: #2563EB;
-  --primary-hover: #1E40AF;
-  --background: #F8FAFC;
-  --surface: #FFFFFF;
-  --text-primary: #0F172A;
-  --text-secondary: #64748B;
-  --success: #16A34A;
-  --danger: #DC2626;
-  --border: #E2E8F0;
+  /* Colors - Light Theme */
+  --primary: #5b7cff;
+  --primary-hover: #4766df;
+  --background: #f3f6ff;
+  --surface: #ffffff;
+  --surface-muted: #eef2ff;
+  --text-primary: #10152a;
+  --text-secondary: #5f6b8a;
+  --success: #18b37a;
+  --danger: #e25555;
+  --border: #dfe5ff;
 
   /* Typography */
   --font-family: 'Inter', sans-serif;
@@ -26,8 +27,22 @@
   --max-width: 1200px;
   --border-radius-card: 16px;
   --border-radius-btn: 12px;
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 10px 28px rgba(20, 33, 90, 0.08);
   --transition: 0.2s ease;
+}
+
+[data-theme='dark'] {
+  --primary: #7a91ff;
+  --primary-hover: #90a3ff;
+  --background: #0d1226;
+  --surface: #161d36;
+  --surface-muted: #1f2848;
+  --text-primary: #edf1ff;
+  --text-secondary: #a9b6dd;
+  --success: #34d399;
+  --danger: #fb7185;
+  --border: #273252;
+  --shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.35);
 }
 
 /* Global Reset and Base Styles */
@@ -44,6 +59,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -64,6 +80,7 @@ p {
 
 .card {
   background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--border-radius-card);
   box-shadow: var(--shadow-soft);
   padding: 2rem;
@@ -123,12 +140,13 @@ p {
 }
 
 .btn-secondary {
-  background-color: var(--text-secondary);
-  color: white;
+  background-color: var(--surface-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background-color: #475569;
+  background-color: var(--surface);
 }
 
 .form-group {
@@ -158,7 +176,7 @@ p {
 .form-group select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
 }
 
 /* Responsive Design */

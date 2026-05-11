@@ -10,15 +10,10 @@ import { BankingService } from '../../banking.service';
   styleUrl: './conv-cripto.css',
 })
 export class ConvCripto implements OnInit {
-  daCripto: string = 'BTC';
-  quantita: number = 0.001;
-  aValuta: string = 'EUR';
-
-  prezzoAttuale: number = 45230.50;
-  totaleFiat: number = 0;
-  equivalenteAltraCripto: number = 0;
+  aValuta: string = 'BTC';
 
   saldoConvertito: number = 0;
+  saldoAttuale: number = 0;
 
   tassiFiat: { [key: string]: number } = {};
 
@@ -26,55 +21,27 @@ export class ConvCripto implements OnInit {
 
   ngOnInit() {
     this.tassiFiat = this.bankingService.tassiFiat;
-    this.calcolaConversione();
-    this.aggiornaSaldoConvertito();
-  }
-
-  onCriptoChange() {
-    this.aggiornaPrezzo();
-    this.calcolaConversione();
-    this.aggiornaSaldoConvertito();
-  }
-
-  onQuantitaChange() {
-    this.calcolaConversione();
+    this.bankingService.getSaldo().subscribe((saldo) => {
+      this.saldoAttuale = saldo;
+      this.aggiornaSaldoConvertito();
+    });
   }
 
   onValutaTargetChange() {
-    this.calcolaConversione();
     this.aggiornaSaldoConvertito();
-  }
-
-  aggiornaPrezzo() {
-    if (this.daCripto) {
-      this.prezzoAttuale = this.bankingService.prezziCripto[this.daCripto];
-    }
-  }
-
-  calcolaConversione() {
-    if (this.quantita && this.quantita > 0) {
-      // Converti in EUR
-      const valoreInEur = this.quantita * this.bankingService.prezziCripto[this.daCripto];
-
-      // Converti nella valuta target
-      if (this.aValuta in this.bankingService.tassiFiat) {
-        // Conversione a fiat
-        this.totaleFiat = valoreInEur * this.bankingService.tassiFiat[this.aValuta];
-        // Equivalente in ETH come riferimento
-        this.equivalenteAltraCripto = valoreInEur / this.bankingService.prezziCripto['ETH'];
-      } else {
-        // Conversione a cripto
-        this.totaleFiat = valoreInEur * this.bankingService.tassiFiat['EUR']; // Mostra sempre in EUR
-        this.equivalenteAltraCripto = valoreInEur / this.bankingService.prezziCripto[this.aValuta];
-      }
-    }
   }
 
   aggiornaSaldoConvertito() {
     if (this.aValuta in this.bankingService.tassiFiat) {
-      this.saldoConvertito = this.bankingService.getSaldoConvertito(this.aValuta);
+      this.saldoConvertito = this.bankingService.getSaldoConvertito(
+        this.saldoAttuale,
+        this.aValuta
+      );
     } else {
-      this.saldoConvertito = this.bankingService.getSaldoCriptoConvertito(this.aValuta);
+      this.saldoConvertito = this.bankingService.getSaldoCriptoConvertito(
+        this.saldoAttuale,
+        this.aValuta
+      );
     }
   }
 
@@ -88,10 +55,6 @@ export class ConvCripto implements OnInit {
 
   getNomeCripto(crypto: string): string {
     return this.bankingService.getNomeCripto(crypto);
-  }
-
-  onConverti() {
-    alert('Funzionalità conversione cripto non implementata.');
   }
 }
 

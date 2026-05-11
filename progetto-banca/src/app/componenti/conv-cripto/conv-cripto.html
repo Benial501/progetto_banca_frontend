@@ -1,37 +1,37 @@
 <div class="cripto-container">
   <h2>₿ Conversione Criptovalute</h2>
+
   <div class="saldo-info">
-    <p>Il tuo saldo attuale convertito in {{aValuta}}: <strong>{{aValuta in ['EUR','USD','GBP','JPY'] ? getSimboloValuta(aValuta) : ''}} {{formattaNumero(saldoConvertito)}} {{aValuta in ['EUR','USD','GBP','JPY'] ? '' : aValuta}}</strong></p>
+    <p>
+      Il tuo saldo attuale:
+      <strong>{{ getSimboloValuta('EUR') }} {{ formattaNumero(saldoAttuale) }}</strong>
+    </p>
   </div>
+
   <div class="cripto-form">
     <div class="form-group">
-      <label for="da-cripto">Da:</label>
-      <select id="da-cripto" [(ngModel)]="daCripto" (change)="onCriptoChange()">
+      <label for="a-cripto">Visualizza saldo convertito in:</label>
+      <select id="a-cripto" [(ngModel)]="aValuta" (change)="onValutaTargetChange()">
+        <option value="EUR">EUR - Euro</option>
+        <option value="USD">USD - Dollaro USA</option>
+        <option value="GBP">GBP - Sterlina</option>
+        <option value="JPY">JPY - Yen</option>
         <option value="BTC">BTC - Bitcoin</option>
         <option value="ETH">ETH - Ethereum</option>
         <option value="BNB">BNB - Binance Coin</option>
         <option value="ADA">ADA - Cardano</option>
       </select>
     </div>
-    <div class="form-group">
-      <label for="quantita">Quantità:</label>
-      <input type="number" id="quantita" [(ngModel)]="quantita" (input)="onQuantitaChange()" placeholder="0.001" min="0.000001" step="0.000001">
-    </div>
-    <div class="form-group">
-      <label for="a-cripto">A:</label>
-      <select id="a-cripto" [(ngModel)]="aValuta" (change)="onValutaTargetChange()">
-        <option value="EUR">EUR - Euro</option>
-        <option value="USD">USD - Dollaro USA</option>
-        <option value="BTC">BTC - Bitcoin</option>
-        <option value="ETH">ETH - Ethereum</option>
-      </select>
-    </div>
+
     <div class="risultato">
-      <div class="prezzo">Prezzo {{getNomeCripto(daCripto)}}: <span>{{getSimboloValuta('EUR')}} {{formattaNumero(prezzoAttuale)}}</span></div>
-      <div class="totale-fiat" *ngIf="aValuta !== daCripto">Valore in {{aValuta}}: <span>{{getSimboloValuta(aValuta)}} {{formattaNumero(totaleFiat)}}</span></div>
-      <div class="equivalente-cripto" *ngIf="aValuta in tassiFiat">Equivalente in ETH: <span>{{formattaNumero(equivalenteAltraCripto, 4)}} Ξ</span></div>
-      <div class="equivalente-cripto" *ngIf="!(aValuta in tassiFiat) && aValuta !== daCripto">Equivalente in EUR: <span>€ {{formattaNumero(totaleFiat)}}</span></div>
+      <div class="totale-fiat" *ngIf="aValuta in tassiFiat">
+        Saldo convertito:
+        <span>{{ getSimboloValuta(aValuta) }} {{ formattaNumero(saldoConvertito) }}</span>
+      </div>
+      <div class="equivalente-cripto" *ngIf="!(aValuta in tassiFiat)">
+        Saldo convertito:
+        <span>{{ formattaNumero(saldoConvertito, 6) }} {{ aValuta }}</span>
+      </div>
     </div>
-    <button class="btn btn-primary" (click)="onConverti()">Converti Cripto</button>
   </div>
 </div>

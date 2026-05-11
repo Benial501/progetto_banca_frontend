@@ -25,11 +25,12 @@
   <div class="movimenti-list">
     <div
       class="movimento-item"
-      *ngFor="let trans of transazioni"
+      *ngFor="let trans of transazioniFiltrate"
       [ngClass]="{
         'entrata': trans.tipo === 'deposito',
         'uscita': trans.tipo === 'prelievo'
       }"
+      [routerLink]="['/transazioni', trans.id]"
     >
       <div class="movimento-info">
         <div class="movimento-descrizione">

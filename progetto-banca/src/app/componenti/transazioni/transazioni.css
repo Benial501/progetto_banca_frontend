@@ -17,3 +17,46 @@
   text-align: center;
   color: var(--text-secondary);
 }
+
+.dettaglio-card {
+  background-color: var(--surface);
+  border-radius: var(--border-radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dettaglio-riga {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.dettaglio-riga:last-child {
+  border-bottom: none;
+}
+
+.dettaglio-riga span {
+  color: var(--text-secondary);
+}
+
+.dettaglio-riga strong {
+  color: var(--text-primary);
+}
+
+.dettaglio-riga strong.entrata {
+  color: var(--success);
+}
+
+.dettaglio-riga strong.uscita {
+  color: var(--danger);
+}
+
+.btn-back {
+  display: inline-block;
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: var(--font-weight-semibold);
+}

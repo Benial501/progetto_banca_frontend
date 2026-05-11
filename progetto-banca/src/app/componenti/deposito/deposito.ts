@@ -16,13 +16,16 @@ export class Deposito {
 
   onSubmit() {
     if (this.importo > 0) {
-      const success = this.bankingService.deposito(this.importo, `Deposito via ${this.metodo}`);
-      if (success) {
-        alert(`Deposito di €${this.importo.toFixed(2)} effettuato con successo!`);
-        this.importo = 0; // Reset form
-      } else {
-        alert('Errore: importo non valido.');
-      }
+      this.bankingService
+        .deposito(this.importo, `Deposito via ${this.metodo}`)
+        .subscribe((success) => {
+          if (success) {
+            alert(`Deposito di €${this.importo.toFixed(2)} effettuato con successo!`);
+            this.importo = 0;
+          } else {
+            alert('Errore: importo non valido.');
+          }
+        });
     } else {
       alert('Inserisci un importo valido.');
     }

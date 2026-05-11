@@ -1,96 +1,35 @@
-/* Deposito Component Styles */
-
 .deposito-container {
-  max-width: 500px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-.deposito-container h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: var(--text-primary);
-  font-size: 2rem;
+  min-height: calc(100vh - 150px);
+  display: grid;
+  place-items: center;
 }
 
 .deposito-form {
+  width: min(680px, 100%);
   background-color: var(--surface);
-  border-radius: var(--border-radius-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
   box-shadow: var(--shadow-soft);
   padding: 2rem;
-  transition: var(--transition);
 }
 
-.deposito-form:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+.deposito-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
-.btn-deposito {
+.deposito-form .btn {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .deposito-container {
-    margin: 1rem auto;
+    min-height: auto;
+    padding-top: 1rem;
   }
 
   .deposito-form {
-    padding: 1.5rem;
-  }
-}
-  color: #191c1f;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #0075eb;
-  box-shadow: 0 0 0 3px rgba(0, 117, 235, 0.1);
-  background: #ffffff;
-}
-
-.form-group input::placeholder {
-  color: #8a8e91;
-}
-
-.btn-deposito {
-  background: linear-gradient(135deg, #0075eb 0%, #0057d9 100%);
-  color: #ffffff;
-  border: none;
-  padding: 16px 32px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 16px rgba(0, 117, 235, 0.3);
-}
-
-.btn-deposito:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0, 117, 235, 0.4);
-}
-
-.btn-deposito:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 117, 235, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .deposito-container {
-    margin: 20px;
-    padding: 24px;
-    border-radius: 20px;
-  }
-
-  .deposito-container h2 {
-    font-size: 24px;
+    padding: 1.2rem;
   }
 }

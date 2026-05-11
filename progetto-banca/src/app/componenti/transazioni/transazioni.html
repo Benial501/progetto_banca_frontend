@@ -1,5 +1,40 @@
 <div class="transazioni-container">
-  <h2>📄 Dettagli Transazione</h2>
-  <p>Componente per visualizzare i dettagli di una singola transazione.</p>
-  <p>Questa funzionalità sarà implementata in futuro.</p>
+  <h2>📄 Dettaglio Movimento</h2>
+
+  <p *ngIf="loading">Caricamento dettaglio...</p>
+
+  <div class="dettaglio-card" *ngIf="!loading && transazione; else notFound">
+    <div class="dettaglio-riga">
+      <span>ID</span>
+      <strong>#{{ transazione.id }}</strong>
+    </div>
+    <div class="dettaglio-riga">
+      <span>Descrizione</span>
+      <strong>{{ transazione.descrizione }}</strong>
+    </div>
+    <div class="dettaglio-riga">
+      <span>Tipo</span>
+      <strong>{{ transazione.tipo }}</strong>
+    </div>
+    <div class="dettaglio-riga">
+      <span>Data</span>
+      <strong>{{ transazione.data | date:'dd/MM/yyyy HH:mm' }}</strong>
+    </div>
+    <div class="dettaglio-riga">
+      <span>Importo</span>
+      <strong [class.entrata]="transazione.importo > 0" [class.uscita]="transazione.importo < 0">
+        {{ transazione.importo | number:'1.2-2' }} €
+      </strong>
+    </div>
+    <div class="dettaglio-riga">
+      <span>Saldo dopo operazione</span>
+      <strong>{{ transazione.saldoDopo | number:'1.2-2' }} €</strong>
+    </div>
+  </div>
+
+  <ng-template #notFound>
+    <p *ngIf="!loading">Transazione non trovata.</p>
+  </ng-template>
+
+  <a routerLink="/lista-movimenti" class="btn-back">← Torna alla lista movimenti</a>
 </div>

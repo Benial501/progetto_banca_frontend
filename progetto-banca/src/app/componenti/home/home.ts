@@ -1,21 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
-  menuOpen = false;
-
-  toggleMenu() {
-    this.menuOpen = !this.menuOpen;
-  }
-
-  closeMenu() {
-    this.menuOpen = false;
-  }
-}
+export class Home {}

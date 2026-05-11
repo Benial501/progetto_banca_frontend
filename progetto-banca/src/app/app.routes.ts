@@ -18,5 +18,6 @@ export const routes: Routes = [
   { path: 'lista-movimenti', component: ListaMovimenti },
   { path: 'conv-fiat', component: ConvFiat },
   { path: 'conv-cripto', component: ConvCripto },
-  { path: 'transazioni', component: Transazioni }
+  { path: 'transazioni/:id', component: Transazioni },
+  { path: 'transazioni', redirectTo: 'lista-movimenti', pathMatch: 'full' }
 ];

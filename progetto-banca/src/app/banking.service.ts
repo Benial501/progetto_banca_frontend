@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, Observable, of, switchMap } from 'rxjs';
 
 export interface Transazione {
   id: number;
@@ -13,8 +15,11 @@ export interface Transazione {
   providedIn: 'root'
 })
 export class BankingService {
-  private saldoCorrente: number = 2450.67; // Saldo iniziale
-  private transazioni: Transazione[] = [
+  private readonly apiBaseUrl = 'http://localhost/mini-banking';
+  private readonly accountId = 1;
+
+  // fallback locale se backend non disponibile
+  private transazioniFallback: Transazione[] = [
     {
       id: 1,
       tipo: 'deposito',
@@ -65,55 +70,117 @@ export class BankingService {
     'ADA': 0.45
   };
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
-  getSaldo(): number {
-    return this.saldoCorrente;
+  getSaldo(): Observable<number> {
+    return this.getTransazioni().pipe(
+      map((transazioni) => transazioni[0]?.saldoDopo ?? 0)
+    );
   }
 
-  getTransazioni(): Transazione[] {
-    return [...this.transazioni].reverse(); // Più recenti prima
+  getTransazioni(): Observable<Transazione[]> {
+    return this.http
+      .get<unknown[]>(
+        `${this.apiBaseUrl}/accounts/${this.accountId}/transactions`
+      )
+      .pipe(
+        map((apiRows) => this.mapTransazioniApi(apiRows)),
+        catchError(() => of([...this.transazioniFallback].reverse()))
+      );
   }
 
-  deposito(importo: number, descrizione: string = 'Deposito'): boolean {
-    if (importo <= 0) return false;
+  getTransazioneById(id: number): Observable<Transazione | undefined> {
+    return this.http
+      .get<unknown[]>(
+        `${this.apiBaseUrl}/accounts/${this.accountId}/transactions/${id}`
+      )
+      .pipe(
+        map((apiRows) => this.mapTransazioniApi(apiRows)[0]),
+        catchError(() =>
+          this.getTransazioni().pipe(
+            map((transazioni) =>
+              transazioni.find((transazione) => transazione.id === id)
+            )
+          )
+        )
+      );
+  }
 
-    this.saldoCorrente += importo;
-    const transazione: Transazione = {
-      id: this.transazioni.length + 1,
-      tipo: 'deposito',
-      importo: importo,
-      descrizione: descrizione,
-      data: new Date(),
-      saldoDopo: this.saldoCorrente
+  deposito(importo: number, descrizione: string = 'Deposito'): Observable<boolean> {
+    if (importo <= 0) {
+      return of(false);
+    }
+
+    const payload = {
+      amount: importo,
+      description: descrizione
     };
-    this.transazioni.push(transazione);
-    return true;
+
+    return this.http
+      .post(
+        `${this.apiBaseUrl}/accounts/${this.accountId}/deposits`,
+        payload
+      )
+      .pipe(
+        map(() => true),
+        catchError(() => {
+          const saldoCorrente = this.getSaldoFallback();
+          const transazione: Transazione = {
+            id: this.transazioniFallback.length + 1,
+            tipo: 'deposito',
+            importo,
+            descrizione,
+            data: new Date(),
+            saldoDopo: saldoCorrente + importo
+          };
+          this.transazioniFallback.push(transazione);
+          return of(true);
+        }),
+        switchMap((esito) => this.getTransazioni().pipe(map(() => esito)))
+      );
   }
 
-  prelievo(importo: number, descrizione: string = 'Prelievo'): boolean {
-    if (importo <= 0 || importo > this.saldoCorrente) return false;
+  prelievo(importo: number, descrizione: string = 'Prelievo'): Observable<boolean> {
+    if (importo <= 0 || importo > this.getSaldoFallback()) {
+      return of(false);
+    }
 
-    this.saldoCorrente -= importo;
-    const transazione: Transazione = {
-      id: this.transazioni.length + 1,
-      tipo: 'prelievo',
-      importo: -importo,
-      descrizione: descrizione,
-      data: new Date(),
-      saldoDopo: this.saldoCorrente
+    const payload = {
+      amount: importo,
+      description: descrizione
     };
-    this.transazioni.push(transazione);
-    return true;
+
+    return this.http
+      .post(
+        `${this.apiBaseUrl}/accounts/${this.accountId}/withdrawals`,
+        payload
+      )
+      .pipe(
+        map(() => true),
+        catchError(() => {
+          const saldoCorrente = this.getSaldoFallback();
+          const transazione: Transazione = {
+            id: this.transazioniFallback.length + 1,
+            tipo: 'prelievo',
+            importo: -importo,
+            descrizione,
+            data: new Date(),
+            saldoDopo: saldoCorrente - importo
+          };
+          this.transazioniFallback.push(transazione);
+          return of(true);
+        }),
+        switchMap((esito) => this.getTransazioni().pipe(map(() => esito)))
+      );
   }
 
-  getSaldoConvertito(valuta: string): number {
-    if (valuta === 'EUR') return this.saldoCorrente;
-    return this.saldoCorrente * this.tassiFiat[valuta];
+  getSaldoConvertito(saldo: number, valuta: string): number {
+    if (valuta === 'EUR') return saldo;
+    return saldo * this.tassiFiat[valuta];
   }
 
-  getSaldoCriptoConvertito(cripto: string): number {
-    return this.saldoCorrente / this.prezziCripto[cripto];
+  getSaldoCriptoConvertito(saldo: number, cripto: string): number {
+    return saldo / this.prezziCripto[cripto];
   }
 
   getSimboloValuta(valuta: string): string {
@@ -134,5 +201,43 @@ export class BankingService {
       'ADA': 'Cardano'
     };
     return nomi[crypto] || crypto;
+  }
+
+  private mapTransazioniApi(apiRows: unknown[]): Transazione[] {
+    const rows = Array.isArray(apiRows) ? apiRows : [];
+
+    return rows
+      .map((row) => {
+        const raw = row as Record<string, unknown>;
+        const id = Number(raw['id'] ?? raw['transaction_id'] ?? 0);
+        const amount = Number(raw['amount'] ?? raw['importo'] ?? 0);
+        const typeRaw = String(raw['type'] ?? raw['tipo'] ?? '');
+        const description = String(raw['description'] ?? raw['descrizione'] ?? '');
+        const createdAt = String(raw['created_at'] ?? raw['data'] ?? new Date().toISOString());
+        const balanceAfter = Number(
+          raw['balance_after'] ?? raw['saldo_dopo'] ?? raw['saldoDopo'] ?? 0
+        );
+
+        let tipo: Transazione['tipo'] = 'conversione';
+        if (typeRaw.includes('deposit')) tipo = 'deposito';
+        if (typeRaw.includes('withdraw')) tipo = 'prelievo';
+
+        return {
+          id,
+          tipo,
+          importo: amount,
+          descrizione: description || (tipo === 'deposito' ? 'Deposito' : 'Prelievo'),
+          data: new Date(createdAt),
+          saldoDopo: balanceAfter
+        } satisfies Transazione;
+      })
+      .sort((a, b) => b.data.getTime() - a.data.getTime());
+  }
+
+  private getSaldoFallback(): number {
+    const transazioniOrdinate = [...this.transazioniFallback].sort(
+      (a, b) => b.data.getTime() - a.data.getTime()
+    );
+    return transazioniOrdinate[0]?.saldoDopo ?? 0;
   }
 }

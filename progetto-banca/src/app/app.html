@@ -1,3 +1,42 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" routerLink="/" (click)="closeMenu()">Banking App</a>
 
+      <nav class="desktop-nav">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+        <a routerLink="/saldo" routerLinkActive="active">Saldo</a>
+        <a routerLink="/deposito" routerLinkActive="active">Deposito</a>
+        <a routerLink="/prelievo" routerLinkActive="active">Prelievo</a>
+        <a routerLink="/lista-movimenti" routerLinkActive="active">Movimenti</a>
+        <a routerLink="/conv-fiat" routerLinkActive="active">Conv. Fiat</a>
+        <a routerLink="/conv-cripto" routerLinkActive="active">Conv. Cripto</a>
+      </nav>
 
-<app-home></app-home>
+      <div class="topbar-actions">
+        <button class="theme-toggle" (click)="toggleTheme()" aria-label="Cambia tema">
+          {{ isDarkMode ? '☀️' : '🌙' }}
+        </button>
+        <button class="hamburger" (click)="toggleMenu()" [class.active]="menuOpen" aria-label="Apri menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mobile-nav" [class.active]="menuOpen">
+      <a routerLink="/" (click)="closeMenu()">Home</a>
+      <a routerLink="/saldo" (click)="closeMenu()">Saldo</a>
+      <a routerLink="/deposito" (click)="closeMenu()">Deposito</a>
+      <a routerLink="/prelievo" (click)="closeMenu()">Prelievo</a>
+      <a routerLink="/lista-movimenti" (click)="closeMenu()">Movimenti</a>
+      <a routerLink="/conv-fiat" (click)="closeMenu()">Conv. Fiat</a>
+      <a routerLink="/conv-cripto" (click)="closeMenu()">Conv. Cripto</a>
+    </nav>
+  </header>
+
+  <main class="page-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

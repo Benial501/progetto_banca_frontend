@@ -17,15 +17,16 @@ export class Prelievo {
 
   onSubmit() {
     if (this.importo > 0 && this.iban && this.causale) {
-      const success = this.bankingService.prelievo(this.importo, this.causale);
-      if (success) {
-        alert(`Prelievo di €${this.importo.toFixed(2)} effettuato con successo!`);
-        this.importo = 0;
-        this.iban = '';
-        this.causale = '';
-      } else {
-        alert('Errore: importo non valido o saldo insufficiente.');
-      }
+      this.bankingService.prelievo(this.importo, this.causale).subscribe((success) => {
+        if (success) {
+          alert(`Prelievo di €${this.importo.toFixed(2)} effettuato con successo!`);
+          this.importo = 0;
+          this.iban = '';
+          this.causale = '';
+        } else {
+          alert('Errore: importo non valido o saldo insufficiente.');
+        }
+      });
     } else {
       alert('Compila tutti i campi correttamente.');
     }
