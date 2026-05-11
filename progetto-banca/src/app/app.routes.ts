@@ -7,6 +7,7 @@ import { Saldo } from './componenti/saldo/saldo';
 import { ListaMovimenti } from './componenti/lista-movimenti/lista-movimenti';
 import { ConvFiat } from './componenti/conv-fiat/conv-fiat';
 import { ConvCripto } from './componenti/conv-cripto/conv-cripto';
+import { Transazioni } from './componenti/transazioni/transazioni';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'saldo', component: Saldo },
   { path: 'lista-movimenti', component: ListaMovimenti },
   { path: 'conv-fiat', component: ConvFiat },
-  { path: 'conv-cripto', component: ConvCripto }
+  { path: 'conv-cripto', component: ConvCripto },
+  { path: 'transazioni', component: Transazioni }
 ];

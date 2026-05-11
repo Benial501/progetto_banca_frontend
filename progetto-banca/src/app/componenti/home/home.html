@@ -12,9 +12,35 @@
       <li><a routerLink="/lista-movimenti" (click)="closeMenu()">Lista Movimenti</a></li>
       <li><a routerLink="/conv-fiat" (click)="closeMenu()">Conversione Fiat</a></li>
       <li><a routerLink="/conv-cripto" (click)="closeMenu()">Conversione Cripto</a></li>
+      <li><a routerLink="/transazioni" (click)="closeMenu()">Transazioni</a></li>
     </ul>
   </div>
 </nav>
+
+<div class="home-container">
+  <div class="welcome-section">
+    <h1>Benvenuto nella tua Banca Digitale</h1>
+    <p>Gestisci i tuoi soldi in modo semplice e sicuro</p>
+  </div>
+
+  <div class="quick-cards">
+    <div class="quick-card">
+      <h3>💰 Deposito</h3>
+      <p>Aggiungi fondi al tuo conto</p>
+      <a routerLink="/deposito" class="btn btn-primary">Vai al Deposito</a>
+    </div>
+    <div class="quick-card">
+      <h3>💸 Prelievo</h3>
+      <p>Preleva i tuoi soldi</p>
+      <a routerLink="/prelievo" class="btn btn-danger">Vai al Prelievo</a>
+    </div>
+    <div class="quick-card">
+      <h3>🔄 Conversioni</h3>
+      <p>Converti valute e cripto</p>
+      <a routerLink="/conv-fiat" class="btn btn-primary">Converti</a>
+    </div>
+  </div>
+</div>
 
 <!-- Qui verranno caricati i componenti -->
 <router-outlet></router-outlet>

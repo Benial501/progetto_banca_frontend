@@ -3,16 +3,16 @@
   <div class="prelievo-form">
     <div class="form-group">
       <label for="importo-prelievo">Importo da prelevare (€):</label>
-      <input type="number" id="importo-prelievo" placeholder="0.00" min="0.01" step="0.01">
+      <input type="number" id="importo-prelievo" [(ngModel)]="importo" placeholder="0.00" min="0.01" step="0.01">
     </div>
     <div class="form-group">
       <label for="iban">IBAN di destinazione:</label>
-      <input type="text" id="iban" placeholder="IT60X0542811101000000123456">
+      <input type="text" id="iban" [(ngModel)]="iban" placeholder="IT60X0542811101000000123456">
     </div>
     <div class="form-group">
       <label for="causale">Causale:</label>
-      <input type="text" id="causale" placeholder="Prelievo conto corrente">
+      <input type="text" id="causale" [(ngModel)]="causale" placeholder="Prelievo conto corrente">
     </div>
-    <button class="btn-prelievo">Conferma Prelievo</button>
+    <button class="btn btn-danger" (click)="onSubmit()">Conferma Prelievo</button>
   </div>
 </div>

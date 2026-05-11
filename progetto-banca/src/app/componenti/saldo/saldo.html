@@ -3,12 +3,12 @@
   <div class="saldo-card">
     <div class="saldo-amount">
       <span class="currency">€</span>
-      <span class="amount">2,450.67</span>
+      <span class="amount">{{ saldo | number:'1.2-2' }}</span>
     </div>
     <div class="saldo-details">
       <div class="detail-item">
         <span class="label">Disponibile:</span>
-        <span class="value">€ 2,450.67</span>
+        <span class="value">€ {{ saldo | number:'1.2-2' }}</span>
       </div>
       <div class="detail-item">
         <span class="label">In sospeso:</span>
@@ -21,7 +21,7 @@
     </div>
   </div>
   <div class="saldo-actions">
-    <button class="btn-refresh">Aggiorna Saldo</button>
-    <button class="btn-statement">Estratto Conto</button>
+    <button class="btn btn-secondary" (click)="onAggiorna()">Aggiorna Saldo</button>
+    <button class="btn btn-secondary" (click)="onEstrattoConto()">Estratto Conto</button>
   </div>
 </div>

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { BankingService } from '../../banking.service';
 
 @Component({
   selector: 'app-conv-fiat',
+  standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './conv-fiat.html',
   styleUrl: './conv-fiat.css',
@@ -17,29 +19,19 @@ export class ConvFiat implements OnInit {
   totaleFiat: number = 0;
   equivalenteCripto: number = 0;
 
-  // Tassi di cambio fiat (EUR come base)
-  tassiFiat: { [key: string]: number } = {
-    'EUR': 1,
-    'USD': 1.0865,
-    'GBP': 0.8523,
-    'JPY': 156.78
-  };
+  saldoConvertito: number = 0;
 
-  // Prezzi cripto in EUR
-  prezziCripto: { [key: string]: number } = {
-    'BTC': 45230.50,
-    'ETH': 2456.78,
-    'BNB': 312.45,
-    'ADA': 0.45
-  };
+  constructor(private bankingService: BankingService) {}
 
   ngOnInit() {
     this.calcolaConversione();
+    this.aggiornaSaldoConvertito();
   }
 
   onValutaChange() {
     this.aggiornaTasso();
     this.calcolaConversione();
+    this.aggiornaSaldoConvertito();
   }
 
   onImportoChange() {
@@ -48,21 +40,27 @@ export class ConvFiat implements OnInit {
 
   aggiornaTasso() {
     if (this.daValuta && this.aValuta) {
-      this.tassoDiCambio = this.tassiFiat[this.aValuta] / this.tassiFiat[this.daValuta];
+      const tassoDa = this.bankingService.tassiFiat[this.daValuta] ?? 1;
+      const tassoA = this.bankingService.tassiFiat[this.aValuta] ?? 1;
+      this.tassoDiCambio = tassoA / tassoDa;
     }
   }
 
   calcolaConversione() {
     if (this.importo && this.importo > 0) {
-      // Converti in EUR prima
-      const importoInEur = this.importo / this.tassiFiat[this.daValuta];
+      const tassoDa = this.bankingService.tassiFiat[this.daValuta] ?? 1;
+      const tassoA = this.bankingService.tassiFiat[this.aValuta] ?? 1;
+      const prezzoBTC = this.bankingService.prezziCripto['BTC'] ?? 1;
 
-      // Converti nella valuta target
-      this.totaleFiat = importoInEur * this.tassiFiat[this.aValuta];
-
-      // Calcola equivalente in BTC
-      this.equivalenteCripto = importoInEur / this.prezziCripto['BTC'];
+      const importoInEur = this.importo / tassoDa;
+      this.totaleFiat = importoInEur * tassoA;
+      this.equivalenteCripto = importoInEur / prezzoBTC;
     }
+  }
+
+  aggiornaSaldoConvertito() {
+    this.saldoConvertito =
+      this.bankingService.getSaldoConvertito(this.aValuta);
   }
 
   formattaNumero(num: number, decimali: number = 2): string {
@@ -70,12 +68,10 @@ export class ConvFiat implements OnInit {
   }
 
   getSimboloValuta(valuta: string): string {
-    const simboli: { [key: string]: string } = {
-      'EUR': '€',
-      'USD': '$',
-      'GBP': '£',
-      'JPY': '¥'
-    };
-    return simboli[valuta] || valuta;
+    return this.bankingService.getSimboloValuta(valuta);
+  }
+
+  onConverti() {
+    alert('Funzionalità conversione non implementata.');
   }
 }

@@ -1,53 +1,46 @@
-/* ==================== REVOLUT-STYLE DESIGN ==================== */
+/* Deposito Component Styles */
+
 .deposito-container {
-  max-width: 480px;
-  margin: 40px auto;
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 24px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
 .deposito-container h2 {
-  color: #191c1f;
   text-align: center;
-  margin-bottom: 32px;
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  font-size: 2rem;
 }
 
 .deposito-form {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  background-color: var(--surface);
+  border-radius: var(--border-radius-card);
+  box-shadow: var(--shadow-soft);
+  padding: 2rem;
+  transition: var(--transition);
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.deposito-form:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-.form-group label {
-  font-weight: 600;
-  color: #191c1f;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+.btn-deposito {
+  width: 100%;
+  margin-top: 1rem;
 }
 
-.form-group input,
-.form-group select {
-  padding: 16px 20px;
-  border: 2px solid #e6e8ea;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 500;
-  background: #ffffff;
-  transition: all 0.2s ease;
+/* Responsive */
+@media (max-width: 768px) {
+  .deposito-container {
+    margin: 1rem auto;
+  }
+
+  .deposito-form {
+    padding: 1.5rem;
+  }
+}
   color: #191c1f;
 }
 

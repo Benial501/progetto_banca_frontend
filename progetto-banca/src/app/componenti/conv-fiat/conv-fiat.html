@@ -1,5 +1,8 @@
 <div class="conversione-container">
   <h2>💱 Conversione Fiat</h2>
+  <div class="saldo-info">
+    <p>Il tuo saldo attuale convertito in {{aValuta}}: <strong>{{getSimboloValuta(aValuta)}} {{formattaNumero(saldoConvertito)}}</strong></p>
+  </div>
   <div class="conversione-form">
     <div class="form-group">
       <label for="da-valuta">Da:</label>
@@ -28,6 +31,6 @@
       <div class="totale-fiat">Riceverai: <span>{{getSimboloValuta(aValuta)}} {{formattaNumero(totaleFiat)}}</span></div>
       <div class="equivalente-cripto">Equivalente in BTC: <span>{{formattaNumero(equivalenteCripto, 6)}} ₿</span></div>
     </div>
-    <button class="btn-converti">Converti Ora</button>
+    <button class="btn btn-primary" (click)="onConverti()">Converti Ora</button>
   </div>
 </div>

@@ -1,5 +1,8 @@
 <div class="cripto-container">
   <h2>₿ Conversione Criptovalute</h2>
+  <div class="saldo-info">
+    <p>Il tuo saldo attuale convertito in {{aValuta}}: <strong>{{aValuta in ['EUR','USD','GBP','JPY'] ? getSimboloValuta(aValuta) : ''}} {{formattaNumero(saldoConvertito)}} {{aValuta in ['EUR','USD','GBP','JPY'] ? '' : aValuta}}</strong></p>
+  </div>
   <div class="cripto-form">
     <div class="form-group">
       <label for="da-cripto">Da:</label>
@@ -29,6 +32,6 @@
       <div class="equivalente-cripto" *ngIf="aValuta in tassiFiat">Equivalente in ETH: <span>{{formattaNumero(equivalenteAltraCripto, 4)}} Ξ</span></div>
       <div class="equivalente-cripto" *ngIf="!(aValuta in tassiFiat) && aValuta !== daCripto">Equivalente in EUR: <span>€ {{formattaNumero(totaleFiat)}}</span></div>
     </div>
-    <button class="btn-converti">Converti Cripto</button>
+    <button class="btn btn-primary" (click)="onConverti()">Converti Cripto</button>
   </div>
 </div>
