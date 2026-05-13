@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BankingService } from '../../banking.service';
 
@@ -10,25 +10,23 @@ import { BankingService } from '../../banking.service';
 })
 export class Prelievo {
   importo: number = 0;
-  iban: string = '';
   causale: string = '';
 
-  constructor(private bankingService: BankingService) {}
+  private bankingService = inject(BankingService);
 
-  onSubmit() {
-    if (this.importo > 0 && this.iban && this.causale) {
-      this.bankingService.prelievo(this.importo, this.causale).subscribe((success) => {
+  onSubmit(): void {
+    if (this.importo > 0 && this.causale.trim()) {
+      this.bankingService.prelievo(this.importo, this.causale.trim()).subscribe((success) => {
         if (success) {
           alert(`Prelievo di €${this.importo.toFixed(2)} effettuato con successo!`);
           this.importo = 0;
-          this.iban = '';
           this.causale = '';
         } else {
           alert('Errore: importo non valido o saldo insufficiente.');
         }
       });
     } else {
-      alert('Compila tutti i campi correttamente.');
+      alert('Inserisci importo e causale.');
     }
   }
 }

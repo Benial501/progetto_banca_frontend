@@ -1,31 +1,48 @@
 <div class="movimenti-container">
-  <h2>📋 Lista Movimenti</h2>
+  <h2>Lista movimenti</h2>
 
-  <div class="filtri">
-    <div class="filtro-group">
-      <label for="periodo">Periodo:</label>
-      <select id="periodo" [(ngModel)]="periodo" (change)="onFiltroChange()">
-        <option value="oggi">Oggi</option>
-        <option value="settimana">Questa settimana</option>
-        <option value="mese">Questo mese</option>
-        <option value="anno">Quest'anno</option>
-      </select>
+  <div class="filtri-moderni">
+    <div class="filtri-moderni__block">
+      <span class="filtri-moderni__label">Periodo</span>
+      <div class="filtri-moderni__segment" role="group" aria-label="Filtra per periodo">
+        @for (opt of periodoOptions; track opt.value) {
+          <button
+            type="button"
+            class="filtri-moderni__chip"
+            [class.filtri-moderni__chip--active]="periodo() === opt.value"
+            (click)="setPeriodo(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        }
+      </div>
     </div>
 
-    <div class="filtro-group">
-      <label for="tipo">Tipo:</label>
-      <select id="tipo" [(ngModel)]="tipo" (change)="onFiltroChange()">
-        <option value="tutti">Tutti</option>
-        <option value="entrata">Entrate</option>
-        <option value="uscita">Uscite</option>
-      </select>
+    <div class="filtri-moderni__block">
+      <span class="filtri-moderni__label">Tipo</span>
+      <div class="filtri-moderni__segment" role="group" aria-label="Filtra per tipo movimento">
+        @for (opt of tipoOptions; track opt.value) {
+          <button
+            type="button"
+            class="filtri-moderni__chip"
+            [class.filtri-moderni__chip--active]="tipo() === opt.value"
+            (click)="setTipo(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        }
+      </div>
     </div>
   </div>
+
+  @if (banking.transazioniLoading()) {
+    <p class="movimenti-loading">Caricamento movimenti…</p>
+  }
 
   <div class="movimenti-list">
     <div
       class="movimento-item"
-      *ngFor="let trans of transazioniFiltrate"
+      *ngFor="let trans of transazioniFiltrate()"
       [ngClass]="{
         'entrata': trans.tipo === 'deposito',
         'uscita': trans.tipo === 'prelievo'
@@ -37,12 +54,12 @@
           {{ trans.descrizione }}
         </div>
         <div class="movimento-data">
-          {{ trans.data | date:'dd/MM/yyyy' }}
+          {{ trans.data | date: 'dd/MM/yyyy' }}
         </div>
       </div>
 
       <div class="movimento-importo">
-        {{ trans.importo | number:'1.2-2' }} €
+        {{ trans.importo | number: '1.2-2' }} €
       </div>
     </div>
   </div>

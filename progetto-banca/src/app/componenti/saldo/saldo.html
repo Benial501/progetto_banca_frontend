@@ -1,14 +1,18 @@
 <div class="saldo-container">
-  <h2>📊 Il Tuo Saldo</h2>
+  <h2>Il tuo saldo</h2>
   <div class="saldo-card">
     <div class="saldo-amount">
       <span class="currency">€</span>
-      <span class="amount">{{ saldo | number:'1.2-2' }}</span>
+      @if (banking.transazioniLoading()) {
+        <span class="amount">…</span>
+      } @else {
+        <span class="amount">{{ banking.saldo() | number: '1.2-2' }}</span>
+      }
     </div>
     <div class="saldo-details">
       <div class="detail-item">
         <span class="label">Disponibile:</span>
-        <span class="value">€ {{ saldo | number:'1.2-2' }}</span>
+        <span class="value">€ {{ banking.saldo() | number: '1.2-2' }}</span>
       </div>
       <div class="detail-item">
         <span class="label">In sospeso:</span>

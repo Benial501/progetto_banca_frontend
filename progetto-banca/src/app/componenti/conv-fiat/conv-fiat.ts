@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BankingService } from '../../banking.service';
@@ -11,29 +11,16 @@ import { BankingService } from '../../banking.service';
   styleUrl: './conv-fiat.css',
 })
 export class ConvFiat implements OnInit {
-  aValuta: string = 'USD';
+  readonly bankingService = inject(BankingService);
 
-  saldoConvertito: number = 0;
-  saldoAttuale: number = 0;
+  readonly aValuta = signal<string>('USD');
 
-  constructor(private bankingService: BankingService) {}
+  readonly saldoConvertito = computed(() =>
+    this.bankingService.getSaldoConvertito(this.bankingService.saldo(), this.aValuta())
+  );
 
-  ngOnInit() {
-    this.bankingService.getSaldo().subscribe((saldo) => {
-      this.saldoAttuale = saldo;
-      this.aggiornaSaldoConvertito();
-    });
-  }
-
-  onValutaChange() {
-    this.aggiornaSaldoConvertito();
-  }
-
-  aggiornaSaldoConvertito() {
-    this.saldoConvertito = this.bankingService.getSaldoConvertito(
-      this.saldoAttuale,
-      this.aValuta
-    );
+  ngOnInit(): void {
+    this.bankingService.refreshTransazioni().subscribe();
   }
 
   formattaNumero(num: number, decimali: number = 2): string {

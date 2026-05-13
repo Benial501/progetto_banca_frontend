@@ -1,0 +1,50 @@
+<div class="auth-shell">
+  <div class="auth-toolbar">
+    <button type="button" class="theme-toggle-auth" (click)="theme.toggle()" aria-label="Cambia tema chiaro o scuro">
+      {{ theme.isDark() ? 'Giorno' : 'Notte' }}
+    </button>
+  </div>
+
+  <div class="auth-panel">
+    <div class="auth-card">
+      <h1>Accedi</h1>
+      <p class="auth-lead">Inserisci le tue credenziali per aprire il conto.</p>
+
+      @if (error) {
+        <p class="auth-error" role="alert">{{ error }}</p>
+      }
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input
+            id="login-email"
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            required
+            autocomplete="email"
+            placeholder="nome@esempio.it"
+          />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input
+            id="login-password"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit">Entra</button>
+      </form>
+
+      <p class="auth-switch">
+        Non hai un account?
+        <a routerLink="/registrazione">Registrati</a>
+      </p>
+    </div>
+  </div>
+</div>

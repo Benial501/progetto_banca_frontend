@@ -1,17 +1,17 @@
 <div class="conversione-container">
-  <h2>💱 Conversione Fiat</h2>
+  <h2>Conversione Fiat</h2>
 
   <div class="saldo-info">
     <p>
       Il tuo saldo attuale:
-      <strong>{{ getSimboloValuta('EUR') }} {{ formattaNumero(saldoAttuale) }}</strong>
+      <strong>{{ getSimboloValuta('EUR') }} {{ formattaNumero(bankingService.saldo()) }}</strong>
     </p>
   </div>
 
   <div class="conversione-form">
     <div class="form-group">
       <label for="a-valuta">Visualizza saldo convertito in:</label>
-      <select id="a-valuta" [(ngModel)]="aValuta" (change)="onValutaChange()">
+      <select id="a-valuta" [ngModel]="aValuta()" (ngModelChange)="aValuta.set($event)">
         <option value="USD">USD - Dollaro USA</option>
         <option value="EUR">EUR - Euro</option>
         <option value="GBP">GBP - Sterlina</option>
@@ -22,7 +22,7 @@
     <div class="risultato">
       <div class="totale-fiat">
         Saldo convertito:
-        <span>{{ getSimboloValuta(aValuta) }} {{ formattaNumero(saldoConvertito) }}</span>
+        <span>{{ getSimboloValuta(aValuta()) }} {{ formattaNumero(saldoConvertito()) }}</span>
       </div>
     </div>
   </div>

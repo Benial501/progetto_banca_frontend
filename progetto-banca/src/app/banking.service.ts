@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 
 export interface Transazione {
   id: number;
@@ -15,8 +15,14 @@ export interface Transazione {
   providedIn: 'root'
 })
 export class BankingService {
-  private readonly apiBaseUrl = 'http://localhost/mini-banking';
+  private readonly apiBaseUrl = 'https://bankingapi-production-2687.up.railway.app';
   private readonly accountId = 1;
+
+  private readonly transazioniWritable = signal<Transazione[]>([]);
+  readonly transazioni = this.transazioniWritable.asReadonly();
+  readonly transazioniLoading = signal(false);
+
+  readonly saldo = computed(() => this.transazioniWritable()[0]?.saldoDopo ?? 0);
 
   // fallback locale se backend non disponibile
   private transazioniFallback: Transazione[] = [
@@ -72,36 +78,41 @@ export class BankingService {
 
   constructor(private http: HttpClient) {}
 
-  getSaldo(): Observable<number> {
-    return this.getTransazioni().pipe(
-      map((transazioni) => transazioni[0]?.saldoDopo ?? 0)
+  /** Aggiorna i signal da API (o fallback). */
+  refreshTransazioni(): Observable<Transazione[]> {
+    this.transazioniLoading.set(true);
+    return this.http.get<unknown>(`${this.apiBaseUrl}/accounts/${this.accountId}/transactions`).pipe(
+      map((body) => this.mapTransazioniApi(this.normalizeTransactionsRows(body))),
+      tap((list) => this.transazioniWritable.set(list)),
+      catchError(() => {
+        const fb = [...this.transazioniFallback].reverse();
+        this.transazioniWritable.set(fb);
+        return of(fb);
+      }),
+      finalize(() => this.transazioniLoading.set(false))
     );
   }
 
+  getSaldo(): Observable<number> {
+    return this.refreshTransazioni().pipe(map(() => this.saldo()));
+  }
+
   getTransazioni(): Observable<Transazione[]> {
-    return this.http
-      .get<unknown[]>(
-        `${this.apiBaseUrl}/accounts/${this.accountId}/transactions`
-      )
-      .pipe(
-        map((apiRows) => this.mapTransazioniApi(apiRows)),
-        catchError(() => of([...this.transazioniFallback].reverse()))
-      );
+    return this.refreshTransazioni();
   }
 
   getTransazioneById(id: number): Observable<Transazione | undefined> {
+    const cached = this.transazioniWritable().find((t) => t.id === id);
+    if (cached) {
+      return of(cached);
+    }
+
     return this.http
-      .get<unknown[]>(
-        `${this.apiBaseUrl}/accounts/${this.accountId}/transactions/${id}`
-      )
+      .get<unknown>(`${this.apiBaseUrl}/accounts/${this.accountId}/transactions/${id}`)
       .pipe(
-        map((apiRows) => this.mapTransazioniApi(apiRows)[0]),
+        map((body) => this.mapTransazioniApi(this.normalizeTransactionsRows(body))[0]),
         catchError(() =>
-          this.getTransazioni().pipe(
-            map((transazioni) =>
-              transazioni.find((transazione) => transazione.id === id)
-            )
-          )
+          of(this.transazioniWritable().find((transazione) => transazione.id === id))
         )
       );
   }
@@ -117,10 +128,7 @@ export class BankingService {
     };
 
     return this.http
-      .post(
-        `${this.apiBaseUrl}/accounts/${this.accountId}/deposits`,
-        payload
-      )
+      .post(`${this.apiBaseUrl}/accounts/${this.accountId}/deposits`, payload)
       .pipe(
         map(() => true),
         catchError(() => {
@@ -136,12 +144,12 @@ export class BankingService {
           this.transazioniFallback.push(transazione);
           return of(true);
         }),
-        switchMap((esito) => this.getTransazioni().pipe(map(() => esito)))
+        switchMap((esito) => this.refreshTransazioni().pipe(map(() => esito)))
       );
   }
 
   prelievo(importo: number, descrizione: string = 'Prelievo'): Observable<boolean> {
-    if (importo <= 0 || importo > this.getSaldoFallback()) {
+    if (importo <= 0) {
       return of(false);
     }
 
@@ -151,10 +159,7 @@ export class BankingService {
     };
 
     return this.http
-      .post(
-        `${this.apiBaseUrl}/accounts/${this.accountId}/withdrawals`,
-        payload
-      )
+      .post(`${this.apiBaseUrl}/accounts/${this.accountId}/withdrawals`, payload)
       .pipe(
         map(() => true),
         catchError(() => {
@@ -170,7 +175,7 @@ export class BankingService {
           this.transazioniFallback.push(transazione);
           return of(true);
         }),
-        switchMap((esito) => this.getTransazioni().pipe(map(() => esito)))
+        switchMap((esito) => this.refreshTransazioni().pipe(map(() => esito)))
       );
   }
 
@@ -203,6 +208,24 @@ export class BankingService {
     return nomi[crypto] || crypto;
   }
 
+  /** Accetta array diretto, wrapper `{ transactions }` o singola transazione (dettaglio). */
+  private normalizeTransactionsRows(body: unknown): unknown[] {
+    if (Array.isArray(body)) {
+      return body;
+    }
+    if (body && typeof body === 'object') {
+      const obj = body as Record<string, unknown>;
+      const nested = obj['transactions'];
+      if (Array.isArray(nested)) {
+        return nested;
+      }
+      if (obj['id'] != null && (obj['type'] != null || obj['tipo'] != null)) {
+        return [body];
+      }
+    }
+    return [];
+  }
+
   private mapTransazioniApi(apiRows: unknown[]): Transazione[] {
     const rows = Array.isArray(apiRows) ? apiRows : [];
 
@@ -210,7 +233,7 @@ export class BankingService {
       .map((row) => {
         const raw = row as Record<string, unknown>;
         const id = Number(raw['id'] ?? raw['transaction_id'] ?? 0);
-        const amount = Number(raw['amount'] ?? raw['importo'] ?? 0);
+        const amountAbs = Math.abs(Number(raw['amount'] ?? raw['importo'] ?? 0));
         const typeRaw = String(raw['type'] ?? raw['tipo'] ?? '');
         const description = String(raw['description'] ?? raw['descrizione'] ?? '');
         const createdAt = String(raw['created_at'] ?? raw['data'] ?? new Date().toISOString());
@@ -222,10 +245,19 @@ export class BankingService {
         if (typeRaw.includes('deposit')) tipo = 'deposito';
         if (typeRaw.includes('withdraw')) tipo = 'prelievo';
 
+        let importo = amountAbs;
+        if (tipo === 'prelievo') {
+          importo = -amountAbs;
+        } else if (tipo === 'deposito') {
+          importo = amountAbs;
+        } else {
+          importo = Number(raw['amount'] ?? raw['importo'] ?? 0);
+        }
+
         return {
           id,
           tipo,
-          importo: amount,
+          importo,
           descrizione: description || (tipo === 'deposito' ? 'Deposito' : 'Prelievo'),
           data: new Date(createdAt),
           saldoDopo: balanceAfter

@@ -1,21 +1,36 @@
-import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { filter } from 'rxjs';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
+import { ThemeService } from './theme.service';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit {
   menuOpen = false;
-  isDarkMode = false;
+  readonly theme = inject(ThemeService);
+
+  private readonly currentPath = signal('');
+
+  readonly showAppChrome = computed(() => {
+    const p = this.currentPath();
+    return p !== '/login' && p !== '/registrazione';
+  });
+
+  constructor(
+    private router: Router,
+    private auth: AuthService
+  ) {}
 
   ngOnInit(): void {
-    const savedTheme = localStorage.getItem('theme');
-    this.isDarkMode = savedTheme === 'dark';
-    this.applyTheme();
+    this.currentPath.set(this.router.url.split('?')[0]);
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe((e) => this.currentPath.set(e.urlAfterRedirects.split('?')[0]));
   }
 
   toggleMenu(): void {
@@ -27,15 +42,12 @@ export class App implements OnInit {
   }
 
   toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
-    this.applyTheme();
+    this.theme.toggle();
   }
 
-  private applyTheme(): void {
-    document.documentElement.setAttribute(
-      'data-theme',
-      this.isDarkMode ? 'dark' : 'light'
-    );
+  logout(): void {
+    this.auth.logout();
+    this.closeMenu();
+    void this.router.navigateByUrl('/login');
   }
 }

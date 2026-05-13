@@ -1,34 +1,80 @@
-<section class="home-hero">
-  <p class="kicker">Banca Digitale</p>
-  <h1>Controlla i tuoi soldi con uno stile moderno.</h1>
-  <p class="subtitle">
-    Deposita, preleva, converti e traccia i movimenti da un'unica dashboard.
-  </p>
-</section>
+<div class="home-poste">
+  <p class="home-greeting">Ciao, {{ displayName.split(' ')[0] }}</p>
 
-<section class="home-grid">
-  <a class="feature-card" routerLink="/saldo">
-    <h3>Saldo</h3>
-    <p>Visualizza subito disponibilita e riepilogo conto.</p>
-  </a>
-  <a class="feature-card" routerLink="/deposito">
-    <h3>Deposito</h3>
-    <p>Aggiungi fondi in pochi secondi nella tua pagina dedicata.</p>
-  </a>
-  <a class="feature-card" routerLink="/prelievo">
-    <h3>Prelievo</h3>
-    <p>Esegui prelievi con controllo immediato del saldo.</p>
-  </a>
-  <a class="feature-card" routerLink="/lista-movimenti">
-    <h3>Lista Movimenti</h3>
-    <p>Apri il dettaglio di ogni transazione con un click.</p>
-  </a>
-  <a class="feature-card" routerLink="/conv-fiat">
-    <h3>Conversione Fiat</h3>
-    <p>Controvalore aggiornato in valuta fiat selezionata.</p>
-  </a>
-  <a class="feature-card" routerLink="/conv-cripto">
-    <h3>Conversione Cripto</h3>
-    <p>Controvalore del saldo in crypto in tempo reale.</p>
-  </a>
-</section>
+  <section class="virtual-card" aria-label="Carta conto virtuale">
+    <div class="virtual-card__shine" aria-hidden="true"></div>
+    <div class="virtual-card__top">
+      <div class="virtual-card__chip" aria-hidden="true"></div>
+      <span class="virtual-card__brand">Mini Banking</span>
+    </div>
+    <div class="virtual-card__number">5396 &nbsp;•••• &nbsp;•••• &nbsp;{{ cardLastFour() }}</div>
+    <div class="virtual-card__balance-block">
+      <span class="virtual-card__balance-label">Disponibilità</span>
+      @if (banking.transazioniLoading()) {
+        <span class="virtual-card__balance-value virtual-card__balance-value--muted">…</span>
+      } @else {
+        <span class="virtual-card__balance-value">{{ banking.saldo() | number: '1.2-2' }} €</span>
+      }
+    </div>
+    <div class="virtual-card__footer">
+      <div>
+        <span class="virtual-card__meta">Intestatario</span>
+        <span class="virtual-card__meta-strong">{{ displayName | uppercase }}</span>
+      </div>
+      <div class="virtual-card__expiry">
+        <span class="virtual-card__meta">Scadenza</span>
+        <span class="virtual-card__meta-strong">12 / 28</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="home-quick" role="navigation" aria-label="Azioni rapide">
+    <a class="home-quick__btn home-quick__btn--primary" routerLink="/deposito">Versa</a>
+    <a class="home-quick__btn" routerLink="/prelievo">Preleva</a>
+    <a class="home-quick__btn" routerLink="/lista-movimenti">Movimenti</a>
+    <a class="home-quick__btn" routerLink="/conv-fiat">Valute</a>
+    <a class="home-quick__btn" routerLink="/conv-cripto">Crypto</a>
+  </div>
+
+  <section class="home-tx" aria-labelledby="ultimi-movimenti-title">
+    <div class="home-tx__head">
+      <h2 id="ultimi-movimenti-title">Ultimi movimenti</h2>
+      <a routerLink="/lista-movimenti" class="home-tx__link">Vedi tutti</a>
+    </div>
+
+    @if (banking.transazioniLoading()) {
+      <p class="home-tx__empty">Caricamento…</p>
+    } @else if (transazioniRecenti().length === 0) {
+      <p class="home-tx__empty">Nessun movimento da mostrare.</p>
+    } @else {
+      <ul class="home-tx__list">
+        @for (trans of transazioniRecenti(); track trans.id) {
+          <li>
+            <a class="home-tx__row" [routerLink]="['/transazioni', trans.id]">
+              <div class="home-tx__icon" [class.home-tx__icon--in]="trans.tipo === 'deposito'" [class.home-tx__icon--out]="trans.tipo === 'prelievo'">
+                @if (trans.tipo === 'deposito') {
+                  <span>↓</span>
+                } @else if (trans.tipo === 'prelievo') {
+                  <span>↑</span>
+                } @else {
+                  <span>⇄</span>
+                }
+              </div>
+              <div class="home-tx__main">
+                <span class="home-tx__title">{{ trans.descrizione }}</span>
+                <span class="home-tx__date">{{ trans.data | date: 'd MMM yyyy' }}</span>
+              </div>
+              <span
+                class="home-tx__amount"
+                [class.home-tx__amount--in]="trans.importo > 0"
+                [class.home-tx__amount--out]="trans.importo < 0"
+              >
+                {{ trans.importo > 0 ? '+' : '' }}{{ trans.importo | number: '1.2-2' }} €
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

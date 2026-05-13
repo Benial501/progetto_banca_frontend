@@ -1,18 +1,15 @@
 <div class="prelievo-container">
   <div class="prelievo-form">
-    <h2>💸 Effettua un Prelievo</h2>
+    <h2>Effettua un prelievo</h2>
+    <p class="prelievo-hint">L’importo viene addebitato sulla tua carta conto.</p>
     <div class="form-group">
       <label for="importo-prelievo">Importo da prelevare (€):</label>
-      <input type="number" id="importo-prelievo" [(ngModel)]="importo" placeholder="0.00" min="0.01" step="0.01">
-    </div>
-    <div class="form-group">
-      <label for="iban">IBAN di destinazione:</label>
-      <input type="text" id="iban" [(ngModel)]="iban" placeholder="IT60X0542811101000000123456">
+      <input type="number" id="importo-prelievo" [(ngModel)]="importo" placeholder="0.00" min="0.01" step="0.01" />
     </div>
     <div class="form-group">
       <label for="causale">Causale:</label>
-      <input type="text" id="causale" [(ngModel)]="causale" placeholder="Prelievo conto corrente">
+      <input type="text" id="causale" [(ngModel)]="causale" placeholder="Es. spese varie" />
     </div>
-    <button class="btn btn-danger" (click)="onSubmit()">Conferma Prelievo</button>
+    <button type="button" class="btn btn-danger" (click)="onSubmit()">Conferma prelievo</button>
   </div>
 </div>

@@ -1,54 +1,63 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { BankingService, Transazione } from '../../banking.service';
+import { BankingService } from '../../banking.service';
 
 @Component({
   selector: 'app-lista-movimenti',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './lista-movimenti.html',
   styleUrl: './lista-movimenti.css',
 })
 export class ListaMovimenti implements OnInit {
-  transazioni: Transazione[] = [];
-  periodo: string = 'mese';
-  tipo: string = 'tutti';
+  readonly banking = inject(BankingService);
 
-  constructor(private bankingService: BankingService) {}
+  readonly periodo = signal<string>('mese');
+  readonly tipo = signal<string>('tutti');
 
-  ngOnInit() {
-    this.caricaTransazioni();
-  }
+  readonly periodoOptions = [
+    { value: 'oggi', label: 'Oggi' },
+    { value: 'settimana', label: 'Settimana' },
+    { value: 'mese', label: 'Mese' },
+    { value: 'anno', label: 'Anno' },
+  ] as const;
 
-  caricaTransazioni() {
-    this.bankingService.getTransazioni().subscribe((transazioni) => {
-      this.transazioni = transazioni;
-    });
-  }
+  readonly tipoOptions = [
+    { value: 'tutti', label: 'Tutti' },
+    { value: 'entrata', label: 'Entrate' },
+    { value: 'uscita', label: 'Uscite' },
+  ] as const;
 
-  onFiltroChange() {
-    // Manteniamo il metodo per il binding del template:
-    // i dati mostrati vengono filtrati dal getter transazioniFiltrate.
-  }
-
-  get transazioniFiltrate(): Transazione[] {
-    return this.transazioni.filter((transazione) => {
+  readonly transazioniFiltrate = computed(() => {
+    const list = this.banking.transazioni();
+    return list.filter((transazione) => {
       const matchTipo =
-        this.tipo === 'tutti' ||
-        (this.tipo === 'entrata' && transazione.importo > 0) ||
-        (this.tipo === 'uscita' && transazione.importo < 0);
+        this.tipo() === 'tutti' ||
+        (this.tipo() === 'entrata' && transazione.importo > 0) ||
+        (this.tipo() === 'uscita' && transazione.importo < 0);
 
       return matchTipo && this.isNelPeriodo(transazione.data);
     });
+  });
+
+  ngOnInit(): void {
+    this.banking.refreshTransazioni().subscribe();
+  }
+
+  setPeriodo(value: string): void {
+    this.periodo.set(value);
+  }
+
+  setTipo(value: string): void {
+    this.tipo.set(value);
   }
 
   private isNelPeriodo(dataTransazione: Date): boolean {
     const adesso = new Date();
     const data = new Date(dataTransazione);
 
-    switch (this.periodo) {
+    switch (this.periodo()) {
       case 'oggi':
         return data.toDateString() === adesso.toDateString();
       case 'settimana': {

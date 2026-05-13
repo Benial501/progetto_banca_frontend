@@ -1,0 +1,133 @@
+/* Login / registrazione — leggibile in chiaro e scuro */
+
+.auth-shell {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.auth-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.theme-toggle-auth {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle-auth:hover {
+  background: var(--surface-muted);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+.auth-panel {
+  width: 100%;
+  padding: 0 0.25rem 1.5rem;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.auth-card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.65rem;
+  color: var(--text-primary);
+}
+
+.auth-lead {
+  margin: 0 0 1.25rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.auth-error {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .auth-error {
+  color: #fecdd3;
+  background: color-mix(in srgb, var(--danger) 22%, transparent);
+}
+
+.auth-card .form-group label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.auth-card .form-group input {
+  color: var(--text-primary);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+}
+
+.auth-card .form-group input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
+[data-theme='dark'] .auth-card .form-group input {
+  background: color-mix(in srgb, var(--surface-muted) 85%, #0d1226);
+  border-color: var(--border);
+  color: #f1f5ff;
+}
+
+[data-theme='dark'] .auth-card .form-group input::placeholder {
+  color: #94a3c8;
+  opacity: 1;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.auth-switch {
+  margin: 1.35rem 0 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.auth-switch a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+[data-theme='dark'] .auth-switch a {
+  color: #a5b4fc;
+}
+
+[data-theme='dark'] .auth-switch a:hover {
+  color: #c7d2fe;
+}
+
+[data-theme='dark'] .auth-card {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BankingService } from '../../banking.service';
 
@@ -10,13 +10,9 @@ import { BankingService } from '../../banking.service';
   styleUrl: './saldo.css',
 })
 export class Saldo implements OnInit {
-  saldo: number = 0;
+  readonly banking = inject(BankingService);
 
-  constructor(private bankingService: BankingService) {}
-
-  ngOnInit() {
-    this.bankingService.getSaldo().subscribe((saldo) => {
-      this.saldo = saldo;
-    });
+  ngOnInit(): void {
+    this.banking.refreshTransazioni().subscribe();
   }
 }
