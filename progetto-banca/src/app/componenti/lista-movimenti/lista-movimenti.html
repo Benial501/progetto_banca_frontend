@@ -35,32 +35,33 @@
     </div>
   </div>
 
-  @if (banking.transazioniLoading()) {
+  @if (transazioniLoading()) {
     <p class="movimenti-loading">Caricamento movimenti…</p>
   }
 
   <div class="movimenti-list">
-    <div
-      class="movimento-item"
-      *ngFor="let trans of transazioniFiltrate()"
-      [ngClass]="{
-        'entrata': trans.tipo === 'deposito',
-        'uscita': trans.tipo === 'prelievo'
-      }"
-      [routerLink]="['/transazioni', trans.id]"
-    >
-      <div class="movimento-info">
-        <div class="movimento-descrizione">
-          {{ trans.descrizione }}
+    @for (trans of transazioniFiltrate(); track trans.id) {
+      <a
+        class="movimento-item"
+        [routerLink]="['/transazioni', trans.id]"
+        [ngClass]="{
+          entrata: trans.tipo === 'deposito',
+          uscita: trans.tipo === 'prelievo'
+        }"
+      >
+        <div class="movimento-info">
+          <div class="movimento-descrizione">
+            {{ trans.descrizione }}
+          </div>
+          <div class="movimento-data">
+            {{ trans.data | date: 'dd/MM/yyyy' }}
+          </div>
         </div>
-        <div class="movimento-data">
-          {{ trans.data | date: 'dd/MM/yyyy' }}
-        </div>
-      </div>
 
-      <div class="movimento-importo">
-        {{ trans.importo | number: '1.2-2' }} €
-      </div>
-    </div>
+        <div class="movimento-importo">
+          {{ trans.importo | number: '1.2-2' }} €
+        </div>
+      </a>
+    }
   </div>
 </div>

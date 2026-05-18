@@ -1,40 +1,40 @@
 <div class="transazioni-container">
   <h2>📄 Dettaglio Movimento</h2>
 
-  <p *ngIf="loading">Caricamento dettaglio...</p>
-
-  <div class="dettaglio-card" *ngIf="!loading && transazione; else notFound">
-    <div class="dettaglio-riga">
-      <span>ID</span>
-      <strong>#{{ transazione.id }}</strong>
+  @if (loading()) {
+    <p>Caricamento dettaglio...</p>
+  } @else if (transazione(); as t) {
+    <div class="dettaglio-card">
+      <div class="dettaglio-riga">
+        <span>ID</span>
+        <strong>#{{ t.id }}</strong>
+      </div>
+      <div class="dettaglio-riga">
+        <span>Descrizione</span>
+        <strong>{{ t.descrizione }}</strong>
+      </div>
+      <div class="dettaglio-riga">
+        <span>Tipo</span>
+        <strong>{{ t.tipo }}</strong>
+      </div>
+      <div class="dettaglio-riga">
+        <span>Data</span>
+        <strong>{{ t.data | date: 'dd/MM/yyyy HH:mm' }}</strong>
+      </div>
+      <div class="dettaglio-riga">
+        <span>Importo</span>
+        <strong [class.entrata]="t.importo > 0" [class.uscita]="t.importo < 0">
+          {{ t.importo | number: '1.2-2' }} €
+        </strong>
+      </div>
+      <div class="dettaglio-riga">
+        <span>Saldo dopo operazione</span>
+        <strong>{{ t.saldoDopo | number: '1.2-2' }} €</strong>
+      </div>
     </div>
-    <div class="dettaglio-riga">
-      <span>Descrizione</span>
-      <strong>{{ transazione.descrizione }}</strong>
-    </div>
-    <div class="dettaglio-riga">
-      <span>Tipo</span>
-      <strong>{{ transazione.tipo }}</strong>
-    </div>
-    <div class="dettaglio-riga">
-      <span>Data</span>
-      <strong>{{ transazione.data | date:'dd/MM/yyyy HH:mm' }}</strong>
-    </div>
-    <div class="dettaglio-riga">
-      <span>Importo</span>
-      <strong [class.entrata]="transazione.importo > 0" [class.uscita]="transazione.importo < 0">
-        {{ transazione.importo | number:'1.2-2' }} €
-      </strong>
-    </div>
-    <div class="dettaglio-riga">
-      <span>Saldo dopo operazione</span>
-      <strong>{{ transazione.saldoDopo | number:'1.2-2' }} €</strong>
-    </div>
-  </div>
-
-  <ng-template #notFound>
-    <p *ngIf="!loading">Transazione non trovata.</p>
-  </ng-template>
+  } @else {
+    <p>Transazione non trovata.</p>
+  }
 
   <a routerLink="/lista-movimenti" class="btn-back">← Torna alla lista movimenti</a>
 </div>

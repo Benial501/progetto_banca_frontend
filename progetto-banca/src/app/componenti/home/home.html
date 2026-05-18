@@ -10,10 +10,10 @@
     <div class="virtual-card__number">5396 &nbsp;•••• &nbsp;•••• &nbsp;{{ cardLastFour() }}</div>
     <div class="virtual-card__balance-block">
       <span class="virtual-card__balance-label">Disponibilità</span>
-      @if (banking.transazioniLoading()) {
+      @if (transazioniLoading()) {
         <span class="virtual-card__balance-value virtual-card__balance-value--muted">…</span>
       } @else {
-        <span class="virtual-card__balance-value">{{ banking.saldo() | number: '1.2-2' }} €</span>
+        <span class="virtual-card__balance-value">{{ saldoConto() | number: '1.2-2' }} €</span>
       }
     </div>
     <div class="virtual-card__footer">
@@ -42,7 +42,7 @@
       <a routerLink="/lista-movimenti" class="home-tx__link">Vedi tutti</a>
     </div>
 
-    @if (banking.transazioniLoading()) {
+    @if (transazioniLoading()) {
       <p class="home-tx__empty">Caricamento…</p>
     } @else if (transazioniRecenti().length === 0) {
       <p class="home-tx__empty">Nessun movimento da mostrare.</p>

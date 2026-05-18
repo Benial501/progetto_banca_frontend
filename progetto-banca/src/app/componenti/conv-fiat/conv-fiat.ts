@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BankingService } from '../../banking.service';
@@ -13,10 +14,12 @@ import { BankingService } from '../../banking.service';
 export class ConvFiat implements OnInit {
   readonly bankingService = inject(BankingService);
 
+  readonly saldoConto = toSignal(this.bankingService.saldo$, { initialValue: 0 });
+
   readonly aValuta = signal<string>('USD');
 
   readonly saldoConvertito = computed(() =>
-    this.bankingService.getSaldoConvertito(this.bankingService.saldo(), this.aValuta())
+    this.bankingService.getSaldoConvertito(this.saldoConto(), this.aValuta())
   );
 
   ngOnInit(): void {

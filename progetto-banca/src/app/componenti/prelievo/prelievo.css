@@ -25,6 +25,30 @@
   font-size: 0.92rem;
 }
 
+.prelievo-feedback {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.prelievo-feedback--error {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
+
+.prelievo-feedback--ok {
+  background: color-mix(in srgb, #16a34a 14%, transparent);
+  color: #15803d;
+}
+
+.prelievo-saldo-hint {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
 .prelievo-form .btn {
   width: 100%;
   margin-top: 0.5rem;

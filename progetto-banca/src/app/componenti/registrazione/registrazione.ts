@@ -1,7 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../auth.service';
+import { finalize, map, of, switchMap } from 'rxjs';
+import { AuthService, REGISTRATION_CURRENCIES } from '../../auth.service';
+import { BankingService } from '../../banking.service';
 import { ThemeService } from '../../theme.service';
 
 @Component({
@@ -14,16 +16,17 @@ import { ThemeService } from '../../theme.service';
 export class Registrazione implements OnInit {
   readonly theme = inject(ThemeService);
 
-  displayName = '';
-  email = '';
-  password = '';
-  confirmPassword = '';
-  error = '';
+  /** Valute disponibili per il nuovo conto (stesso elenco del backend atteso). */
+  readonly valute = [...REGISTRATION_CURRENCIES];
 
-  constructor(
-    private auth: AuthService,
-    private router: Router
-  ) {}
+  displayName = '';
+  valuta = 'EUR';
+  error = '';
+  loading = false;
+
+  private auth = inject(AuthService);
+  private banking = inject(BankingService);
+  private router = inject(Router);
 
   ngOnInit(): void {
     if (this.auth.isLoggedIn()) {
@@ -33,15 +36,27 @@ export class Registrazione implements OnInit {
 
   onSubmit(): void {
     this.error = '';
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Le password non coincidono.';
-      return;
-    }
-    const res = this.auth.register(this.email, this.password, this.displayName);
-    if (res.ok) {
-      void this.router.navigateByUrl('/');
-    } else {
-      this.error = res.message;
-    }
+    this.loading = true;
+
+    this.auth
+      .register(this.displayName, this.valuta)
+      .pipe(
+        switchMap((res) => {
+          if (!res.ok) {
+            return of(res);
+          }
+          return this.banking.refreshTransazioni().pipe(map(() => res));
+        }),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe((res) => {
+        if (res.ok) {
+          void this.router.navigateByUrl('/');
+        } else {
+          this.error = res.message;
+        }
+      });
   }
 }

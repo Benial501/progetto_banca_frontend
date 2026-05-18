@@ -82,8 +82,6 @@
     padding: 1rem;
   }
 }
-  transition: all 0.2s ease;
-}
 
 .form-group select:focus,
 .form-group input:focus {

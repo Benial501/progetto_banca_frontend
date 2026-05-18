@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { provideRouter } from '@angular/router';
 import { ListaMovimenti } from './lista-movimenti';
 import { BankingService } from '../../banking.service';
@@ -15,8 +15,8 @@ describe('ListaMovimenti', () => {
         {
           provide: BankingService,
           useValue: {
-            transazioni: () => [],
-            transazioniLoading: () => false,
+            transazioni$: new BehaviorSubject([]).asObservable(),
+            transazioniLoading$: new BehaviorSubject(false).asObservable(),
             refreshTransazioni: () => of([]),
           },
         },

@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BankingService } from '../../banking.service';
@@ -12,6 +13,9 @@ import { BankingService } from '../../banking.service';
 })
 export class ListaMovimenti implements OnInit {
   readonly banking = inject(BankingService);
+
+  readonly transazioniList = toSignal(this.banking.transazioni$, { initialValue: [] });
+  readonly transazioniLoading = toSignal(this.banking.transazioniLoading$, { initialValue: false });
 
   readonly periodo = signal<string>('mese');
   readonly tipo = signal<string>('tutti');
@@ -30,7 +34,7 @@ export class ListaMovimenti implements OnInit {
   ] as const;
 
   readonly transazioniFiltrate = computed(() => {
-    const list = this.banking.transazioni();
+    const list = this.transazioniList();
     return list.filter((transazione) => {
       const matchTipo =
         this.tipo() === 'tutti' ||

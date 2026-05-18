@@ -8,7 +8,9 @@
   <div class="auth-panel">
     <div class="auth-card">
       <h1>Crea account</h1>
-      <p class="auth-lead">Registrati per accedere alla tua area riservata.</p>
+      <p class="auth-lead">
+        Inserisci <strong>nome</strong> e <strong>valuta</strong> del conto: il sistema creerà un nuovo conto con un numero univoco.
+      </p>
 
       @if (error) {
         <p class="auth-error" role="alert">{{ error }}</p>
@@ -16,7 +18,7 @@
 
       <form (ngSubmit)="onSubmit()">
         <div class="form-group">
-          <label for="reg-name">Nome e cognome</label>
+          <label for="reg-name">Nome intestatario</label>
           <input
             id="reg-name"
             type="text"
@@ -28,46 +30,22 @@
           />
         </div>
         <div class="form-group">
-          <label for="reg-email">Email</label>
-          <input
-            id="reg-email"
-            type="email"
-            name="email"
-            [(ngModel)]="email"
-            required
-            autocomplete="email"
-            placeholder="nome@esempio.it"
-          />
+          <label for="reg-valuta">Valuta del conto</label>
+          <select id="reg-valuta" name="valuta" [(ngModel)]="valuta" required>
+            @for (v of valute; track v) {
+              <option [value]="v">{{ v }}</option>
+            }
+          </select>
+          <p class="auth-field-hint">La valuta definisce in quale moneta verranno registrati i movimenti.</p>
         </div>
-        <div class="form-group">
-          <label for="reg-password">Password</label>
-          <input
-            id="reg-password"
-            type="password"
-            name="password"
-            [(ngModel)]="password"
-            required
-            minlength="6"
-            autocomplete="new-password"
-          />
-        </div>
-        <div class="form-group">
-          <label for="reg-confirm">Conferma password</label>
-          <input
-            id="reg-confirm"
-            type="password"
-            name="confirmPassword"
-            [(ngModel)]="confirmPassword"
-            required
-            autocomplete="new-password"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary auth-submit">Registrati</button>
+        <button type="submit" class="btn btn-primary auth-submit" [disabled]="loading">
+          {{ loading ? 'Registrazione…' : 'Registrati' }}
+        </button>
       </form>
 
       <p class="auth-switch">
         Hai già un account?
-        <a routerLink="/login">Accedi</a>
+        <a routerLink="/login">Accedi con il numero conto</a>
       </p>
     </div>
   </div>

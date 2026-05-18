@@ -18,6 +18,24 @@
   margin-bottom: 1.5rem;
 }
 
+.deposito-feedback {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.deposito-feedback--error {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
+
+.deposito-feedback--ok {
+  background: color-mix(in srgb, #16a34a 14%, transparent);
+  color: #15803d;
+}
+
 .deposito-form .btn {
   width: 100%;
   margin-top: 0.5rem;

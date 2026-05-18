@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BankingService } from '../../banking.service';
@@ -16,7 +17,11 @@ export class Home implements OnInit {
 
   displayName = 'Cliente';
 
-  readonly transazioniRecenti = computed(() => this.banking.transazioni().slice(0, 8));
+  readonly transazioniList = toSignal(this.banking.transazioni$, { initialValue: [] });
+  readonly transazioniLoading = toSignal(this.banking.transazioniLoading$, { initialValue: false });
+  readonly saldoConto = toSignal(this.banking.saldo$, { initialValue: 0 });
+
+  readonly transazioniRecenti = computed(() => this.transazioniList().slice(0, 8));
 
   ngOnInit(): void {
     const session = this.authService.getSession();
@@ -25,11 +30,7 @@ export class Home implements OnInit {
   }
 
   cardLastFour(): string {
-    const email = this.authService.getSession()?.email ?? 'user';
-    let h = 0;
-    for (let i = 0; i < email.length; i++) {
-      h = (h * 31 + email.charCodeAt(i)) >>> 0;
-    }
-    return String(1000 + (h % 9000));
+    const accountId = this.authService.getSession()?.accountId ?? 0;
+    return String(1000 + (accountId % 9000));
   }
 }

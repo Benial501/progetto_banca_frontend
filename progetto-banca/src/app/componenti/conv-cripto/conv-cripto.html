@@ -4,7 +4,7 @@
   <div class="saldo-info">
     <p>
       Il tuo saldo attuale:
-      <strong>{{ getSimboloValuta('EUR') }} {{ formattaNumero(bankingService.saldo()) }}</strong>
+      <strong>{{ getSimboloValuta('EUR') }} {{ formattaNumero(saldoConto()) }}</strong>
     </p>
   </div>
 
@@ -12,14 +12,10 @@
     <div class="form-group">
       <label for="a-cripto">Visualizza saldo convertito in:</label>
       <select id="a-cripto" [ngModel]="aValuta()" (ngModelChange)="aValuta.set($event)">
-        <option value="EUR">EUR - Euro</option>
-        <option value="USD">USD - Dollaro USA</option>
-        <option value="GBP">GBP - Sterlina</option>
-        <option value="JPY">JPY - Yen</option>
         <option value="BTC">BTC - Bitcoin</option>
         <option value="ETH">ETH - Ethereum</option>
         <option value="BNB">BNB - Binance Coin</option>
-        <option value="ADA">ADA - Cardano</option>
+
       </select>
     </div>
 

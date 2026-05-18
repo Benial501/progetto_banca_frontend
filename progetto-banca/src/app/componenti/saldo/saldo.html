@@ -3,16 +3,16 @@
   <div class="saldo-card">
     <div class="saldo-amount">
       <span class="currency">€</span>
-      @if (banking.transazioniLoading()) {
+      @if (transazioniLoading()) {
         <span class="amount">…</span>
       } @else {
-        <span class="amount">{{ banking.saldo() | number: '1.2-2' }}</span>
+        <span class="amount">{{ saldoConto() | number: '1.2-2' }}</span>
       }
     </div>
     <div class="saldo-details">
       <div class="detail-item">
         <span class="label">Disponibile:</span>
-        <span class="value">€ {{ banking.saldo() | number: '1.2-2' }}</span>
+        <span class="value">€ {{ saldoConto() | number: '1.2-2' }}</span>
       </div>
       <div class="detail-item">
         <span class="label">In sospeso:</span>

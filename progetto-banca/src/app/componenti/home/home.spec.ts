@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Home } from './home';
 import { BankingService } from '../../banking.service';
 import { AuthService } from '../../auth.service';
@@ -17,15 +17,15 @@ describe('Home', () => {
           provide: BankingService,
           useValue: {
             refreshTransazioni: () => of([]),
-            transazioni: () => [],
-            saldo: () => 100,
-            transazioniLoading: () => false,
+            transazioni$: new BehaviorSubject([]).asObservable(),
+            saldo$: new BehaviorSubject(100).asObservable(),
+            transazioniLoading$: new BehaviorSubject(false).asObservable(),
           },
         },
         {
           provide: AuthService,
           useValue: {
-            getSession: () => ({ email: 'test@example.com', displayName: 'Mario Rossi' }),
+            getSession: () => ({ accountId: 1, displayName: 'Mario Rossi' }),
           },
         },
       ],

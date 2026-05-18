@@ -8,7 +8,7 @@
   <div class="auth-panel">
     <div class="auth-card">
       <h1>Accedi</h1>
-      <p class="auth-lead">Inserisci le tue credenziali per aprire il conto.</p>
+      <p class="auth-lead">Inserisci il numero del tuo conto per accedere.</p>
 
       @if (error) {
         <p class="auth-error" role="alert">{{ error }}</p>
@@ -16,29 +16,23 @@
 
       <form (ngSubmit)="onSubmit()">
         <div class="form-group">
-          <label for="login-email">Email</label>
+          <label for="login-account">Numero conto</label>
           <input
-            id="login-email"
-            type="email"
-            name="email"
-            [(ngModel)]="email"
+            id="login-account"
+            type="number"
+            name="accountNumber"
+            [(ngModel)]="accountNumber"
             required
-            autocomplete="email"
-            placeholder="nome@esempio.it"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="Es. 1"
           />
         </div>
-        <div class="form-group">
-          <label for="login-password">Password</label>
-          <input
-            id="login-password"
-            type="password"
-            name="password"
-            [(ngModel)]="password"
-            required
-            autocomplete="current-password"
-          />
-        </div>
-        <button type="submit" class="btn btn-primary auth-submit">Entra</button>
+        <button type="submit" class="btn btn-primary auth-submit" [disabled]="loading">
+          {{ loading ? 'Accesso…' : 'Entra' }}
+        </button>
       </form>
 
       <p class="auth-switch">

@@ -1,6 +1,17 @@
-import { computed, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  BehaviorSubject,
+  catchError,
+  distinctUntilChanged,
+  finalize,
+  map,
+  Observable,
+  of,
+  switchMap,
+  tap
+} from 'rxjs';
+import { AuthService } from './auth.service';
 
 export interface Transazione {
   id: number;
@@ -11,20 +22,46 @@ export interface Transazione {
   saldoDopo: number;
 }
 
+export type PrelievoFailureReason =
+  | 'invalid_amount'
+  | 'insufficient_balance'
+  | 'no_account'
+  | 'unknown';
+
+export type PrelievoResult =
+  | { success: true }
+  | { success: false; reason: PrelievoFailureReason };
+
+function prelievoOk(): PrelievoResult {
+  return { success: true };
+}
+
+function prelievoErr(reason: PrelievoFailureReason): PrelievoResult {
+  return { success: false, reason };
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class BankingService {
   private readonly apiBaseUrl = 'https://bankingapi-production-2687.up.railway.app';
-  private readonly accountId = 1;
+  private readonly auth = inject(AuthService);
+  private readonly http = inject(HttpClient);
 
-  private readonly transazioniWritable = signal<Transazione[]>([]);
-  readonly transazioni = this.transazioniWritable.asReadonly();
-  readonly transazioniLoading = signal(false);
+  private readonly transazioniSubject = new BehaviorSubject<Transazione[]>([]);
+  private readonly loadingSubject = new BehaviorSubject<boolean>(false);
 
-  readonly saldo = computed(() => this.transazioniWritable()[0]?.saldoDopo ?? 0);
+  /** Lista movimenti: aggiornata da refresh e dopo deposito/prelievo riusciti. */
+  readonly transazioni$ = this.transazioniSubject.asObservable();
 
-  // fallback locale se backend non disponibile
+  readonly transazioniLoading$ = this.loadingSubject.asObservable();
+
+  /** Saldo corrente derivato dal movimento più recente (primo elemento dopo ordinamento API). */
+  readonly saldo$: Observable<number> = this.transazioni$.pipe(
+    map((list) => list[0]?.saldoDopo ?? 0),
+    distinctUntilChanged()
+  );
+
   private transazioniFallback: Transazione[] = [
     {
       id: 1,
@@ -37,145 +74,142 @@ export class BankingService {
     {
       id: 2,
       tipo: 'prelievo',
-      importo: -85.30,
+      importo: -85.3,
       descrizione: 'Supermercato',
       data: new Date('2024-05-14'),
-      saldoDopo: 2414.70
-    },
-    {
-      id: 3,
-      tipo: 'deposito',
-      importo: 150,
-      descrizione: 'Rimborso',
-      data: new Date('2024-05-12'),
-      saldoDopo: 2564.70
-    },
-    {
-      id: 4,
-      tipo: 'prelievo',
-      importo: -120.50,
-      descrizione: 'Bollette',
-      data: new Date('2024-05-10'),
-      saldoDopo: 2444.20
+      saldoDopo: 2414.7
     }
   ];
 
-  // Tassi di cambio (EUR come base)
   tassiFiat: { [key: string]: number } = {
-    'EUR': 1,
-    'USD': 1.0865,
-    'GBP': 0.8523,
-    'JPY': 156.78
+    EUR: 1,
+    USD: 1.0865,
+    GBP: 0.8523,
+    JPY: 156.78
   };
 
-  // Prezzi cripto in EUR
   prezziCripto: { [key: string]: number } = {
-    'BTC': 45230.50,
-    'ETH': 2456.78,
-    'BNB': 312.45,
-    'ADA': 0.45
+    BTC: 45230.5,
+    ETH: 2456.78,
+    BNB: 312.45,
+    ADA: 0.45
   };
 
-  constructor(private http: HttpClient) {}
+  private get accountId(): number | null {
+    return this.auth.getAccountId();
+  }
 
-  /** Aggiorna i signal da API (o fallback). */
+  /** Svuota lo stato (es. logout) senza chiamate HTTP. */
+  resetState(): void {
+    this.transazioniSubject.next([]);
+    this.loadingSubject.next(false);
+  }
+
+  /** Aggiorna lista da API e notifica i subscriber tramite BehaviorSubject. */
   refreshTransazioni(): Observable<Transazione[]> {
-    this.transazioniLoading.set(true);
-    return this.http.get<unknown>(`${this.apiBaseUrl}/accounts/${this.accountId}/transactions`).pipe(
+    const accountId = this.accountId;
+    if (accountId == null) {
+      this.transazioniSubject.next([]);
+      return of([]);
+    }
+
+    this.loadingSubject.next(true);
+    return this.http.get<unknown>(`${this.apiBaseUrl}/accounts/${accountId}/transactions`).pipe(
       map((body) => this.mapTransazioniApi(this.normalizeTransactionsRows(body))),
-      tap((list) => this.transazioniWritable.set(list)),
+      tap((list) => this.transazioniSubject.next(list)),
       catchError(() => {
         const fb = [...this.transazioniFallback].reverse();
-        this.transazioniWritable.set(fb);
+        this.transazioniSubject.next(fb);
         return of(fb);
       }),
-      finalize(() => this.transazioniLoading.set(false))
+      finalize(() => this.loadingSubject.next(false))
     );
   }
 
   getSaldo(): Observable<number> {
-    return this.refreshTransazioni().pipe(map(() => this.saldo()));
+    return this.refreshTransazioni().pipe(map((list) => list[0]?.saldoDopo ?? 0));
   }
 
   getTransazioni(): Observable<Transazione[]> {
     return this.refreshTransazioni();
   }
 
-  getTransazioneById(id: number): Observable<Transazione | undefined> {
-    const cached = this.transazioniWritable().find((t) => t.id === id);
-    if (cached) {
-      return of(cached);
+  getTransazioneById(id: number, forceRemote = false): Observable<Transazione | undefined> {
+    const accountId = this.accountId;
+    if (accountId == null) {
+      return of(undefined);
+    }
+
+    if (!forceRemote) {
+      const cached = this.transazioniSubject.getValue().find((t) => t.id === id);
+      if (cached) {
+        return of(cached);
+      }
     }
 
     return this.http
-      .get<unknown>(`${this.apiBaseUrl}/accounts/${this.accountId}/transactions/${id}`)
+      .get<unknown>(`${this.apiBaseUrl}/accounts/${accountId}/transactions/${id}`)
       .pipe(
         map((body) => this.mapTransazioniApi(this.normalizeTransactionsRows(body))[0]),
         catchError(() =>
-          of(this.transazioniWritable().find((transazione) => transazione.id === id))
+          of(this.transazioniSubject.getValue().find((transazione) => transazione.id === id))
         )
       );
   }
 
   deposito(importo: number, descrizione: string = 'Deposito'): Observable<boolean> {
-    if (importo <= 0) {
+    const accountId = this.accountId;
+    if (accountId == null || importo <= 0) {
       return of(false);
     }
 
-    const payload = {
-      amount: importo,
-      description: descrizione
-    };
+    const payload = { amount: importo, description: descrizione };
 
-    return this.http
-      .post(`${this.apiBaseUrl}/accounts/${this.accountId}/deposits`, payload)
-      .pipe(
-        map(() => true),
-        catchError(() => {
-          const saldoCorrente = this.getSaldoFallback();
-          const transazione: Transazione = {
-            id: this.transazioniFallback.length + 1,
-            tipo: 'deposito',
-            importo,
-            descrizione,
-            data: new Date(),
-            saldoDopo: saldoCorrente + importo
-          };
-          this.transazioniFallback.push(transazione);
-          return of(true);
-        }),
-        switchMap((esito) => this.refreshTransazioni().pipe(map(() => esito)))
-      );
+    return this.http.post(`${this.apiBaseUrl}/accounts/${accountId}/deposits`, payload).pipe(
+      map(() => true),
+      catchError(() => {
+        const saldoCorrente = this.getSaldoFallback();
+        const transazione: Transazione = {
+          id: this.transazioniFallback.length + 1,
+          tipo: 'deposito',
+          importo,
+          descrizione,
+          data: new Date(),
+          saldoDopo: saldoCorrente + importo
+        };
+        this.transazioniFallback.push(transazione);
+        return of(true);
+      }),
+      switchMap((esito) => this.refreshTransazioni().pipe(map(() => esito)))
+    );
   }
 
-  prelievo(importo: number, descrizione: string = 'Prelievo'): Observable<boolean> {
+  prelievo(importo: number, descrizione: string = 'Prelievo'): Observable<PrelievoResult> {
+    const accountId = this.accountId;
+    if (accountId == null) {
+      return of(prelievoErr('no_account'));
+    }
     if (importo <= 0) {
-      return of(false);
+      return of(prelievoErr('invalid_amount'));
     }
 
-    const payload = {
-      amount: importo,
-      description: descrizione
-    };
+    const payload = { amount: importo, description: descrizione };
 
     return this.http
-      .post(`${this.apiBaseUrl}/accounts/${this.accountId}/withdrawals`, payload)
+      .post(`${this.apiBaseUrl}/accounts/${accountId}/withdrawals`, payload)
       .pipe(
-        map(() => true),
-        catchError(() => {
-          const saldoCorrente = this.getSaldoFallback();
-          const transazione: Transazione = {
-            id: this.transazioniFallback.length + 1,
-            tipo: 'prelievo',
-            importo: -importo,
-            descrizione,
-            data: new Date(),
-            saldoDopo: saldoCorrente - importo
-          };
-          this.transazioniFallback.push(transazione);
-          return of(true);
+        map((): PrelievoResult => prelievoOk()),
+        catchError((err: unknown): Observable<PrelievoResult> => {
+          if (this.isInsufficientBalanceError(err)) {
+            return of(prelievoErr('insufficient_balance'));
+          }
+          return of(prelievoErr('unknown'));
         }),
-        switchMap((esito) => this.refreshTransazioni().pipe(map(() => esito)))
+        switchMap((esito: PrelievoResult) =>
+          esito.success
+            ? this.refreshTransazioni().pipe(map((): PrelievoResult => prelievoOk()))
+            : of(esito)
+        )
       );
   }
 
@@ -190,25 +224,41 @@ export class BankingService {
 
   getSimboloValuta(valuta: string): string {
     const simboli: { [key: string]: string } = {
-      'EUR': '€',
-      'USD': '$',
-      'GBP': '£',
-      'JPY': '¥'
+      EUR: '€',
+      USD: '$',
+      GBP: '£',
+      JPY: '¥'
     };
     return simboli[valuta] || valuta;
   }
 
   getNomeCripto(crypto: string): string {
     const nomi: { [key: string]: string } = {
-      'BTC': 'Bitcoin',
-      'ETH': 'Ethereum',
-      'BNB': 'Binance Coin',
-      'ADA': 'Cardano'
+      BTC: 'Bitcoin',
+      ETH: 'Ethereum',
+      BNB: 'Binance Coin',
+      ADA: 'Cardano'
     };
     return nomi[crypto] || crypto;
   }
 
-  /** Accetta array diretto, wrapper `{ transactions }` o singola transazione (dettaglio). */
+  private isInsufficientBalanceError(err: unknown): boolean {
+    if (!(err instanceof HttpErrorResponse)) {
+      return false;
+    }
+    if (err.status === 400 || err.status === 422 || err.status === 409) {
+      const bodyText = JSON.stringify(err.error ?? '').toLowerCase();
+      return (
+        bodyText.includes('insufficient') ||
+        bodyText.includes('insufficiente') ||
+        bodyText.includes('saldo') ||
+        bodyText.includes('balance') ||
+        err.status === 422
+      );
+    }
+    return false;
+  }
+
   private normalizeTransactionsRows(body: unknown): unknown[] {
     if (Array.isArray(body)) {
       return body;

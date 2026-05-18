@@ -81,6 +81,11 @@
   overflow: hidden;
 }
 
+a.movimento-item {
+  text-decoration: none;
+  color: inherit;
+}
+
 .movimento-item {
   display: flex;
   justify-content: space-between;
